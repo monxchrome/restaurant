@@ -13,6 +13,10 @@ dist/*
 /tmp
 /out-tsc
 
+.env
+/.env
+/env
+
 # dependencies
 /node_modules
 
