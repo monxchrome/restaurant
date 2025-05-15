@@ -1098,6 +1098,54 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.4.tgz#d897170a2b0ba51f78a099edccd968f7b103387c"
   integrity sha512-ROFF39F6ZrnzSUEmQQZUar0Jt4xVoP9WnDRdWwF4NNcXs3xBTLgBUDoOwW141y1jP+S8nahIbdxbFC7IShw9Iw==
 
+"@prisma/client@^6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-6.8.0.tgz#a7d2acac1f9054f417cba0b6f23c79a67c348abc"
+  integrity sha512-t29bmo2VUOBIlinu0tRHXhj3r8+IwA7azetNOGqK9sQDVq/zwbSWq075P2kDjLhxpIe0L/g06bI22c307Tt4vA==
+
+"@prisma/config@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/config/-/config-6.8.0.tgz#05068451c11716508cee8bf91e79672f6b64c5df"
+  integrity sha512-Bl1SCz6XGa7InatzFBLpY2Ni3anJhPbDHz5RPmmdjaVVnK9Fo1oA4T1FInKLsabn0qjQE6iwCUe6OMu5Up1iGw==
+  dependencies:
+    jiti "2.4.2"
+
+"@prisma/debug@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-6.8.0.tgz#73b39a8f0fbdab85d453bf77f5185a0462fc9327"
+  integrity sha512-QgI80ZgD5xWI+DzNOw2LkZQpE2ZBV9NiTkPqcOTAWe3+sLagGGau4Sp18lrYsemEqzfYD6Zl1YJkCO4JFmywLg==
+
+"@prisma/engines-version@6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e":
+  version "6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e"
+  resolved "https://registry.yarnpkg.com/@prisma/engines-version/-/engines-version-6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e.tgz#fd5885f4c502721ec3f81ad13d4d896d709cc34b"
+  integrity sha512-Rkik9lMyHpFNGaLpPF3H5q5TQTkm/aE7DsGM5m92FZTvWQsvmi6Va8On3pWvqLHOt5aPUvFb/FeZTmphI4CPiQ==
+
+"@prisma/engines@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-6.8.0.tgz#0e9c0271837316c03127c98aa8883043b4027e9e"
+  integrity sha512-F1L6EbM4QsC84KzNk2gBiulmWvj4QRe+9QqHIAgKMPSOPnJhjeNSdcOrc2qkctJxew8F18tyzZOrcgHVg76IxQ==
+  dependencies:
+    "@prisma/debug" "6.8.0"
+    "@prisma/engines-version" "6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e"
+    "@prisma/fetch-engine" "6.8.0"
+    "@prisma/get-platform" "6.8.0"
+
+"@prisma/fetch-engine@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/fetch-engine/-/fetch-engine-6.8.0.tgz#f6914c622f16a37f60d6a4348cf407fe394faa7e"
+  integrity sha512-3mXaUxyqA2IHWGw4uHsA7yXyN2F6KVJ8Re7JgUwsHsYS4rgXXC7N4YIFfuStFw2y937RHgJfxzYBt2djkIbZXw==
+  dependencies:
+    "@prisma/debug" "6.8.0"
+    "@prisma/engines-version" "6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e"
+    "@prisma/get-platform" "6.8.0"
+
+"@prisma/get-platform@6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@prisma/get-platform/-/get-platform-6.8.0.tgz#ecdc03b33894fd0113999b2139419f3b211d90ea"
+  integrity sha512-NyHPoTGOZt/pDSWh0ioSU8EylBpEKdrCpgh5kfIqLww/HGMfgdmCPVMf+qBtSJXthqUIS6qAZ04Bvwq1qJHEdg==
+  dependencies:
+    "@prisma/debug" "6.8.0"
+
 "@sec-ant/readable-stream@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@sec-ant/readable-stream/-/readable-stream-0.4.1.tgz#60de891bb126abfdc5410fdc6166aca065f10a0c"
@@ -3966,6 +4014,11 @@ jest@^29.7.0:
     import-local "^3.0.2"
     jest-cli "^29.7.0"
 
+jiti@2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.4.2.tgz#d19b7732ebb6116b06e2038da74a55366faef560"
+  integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
+
 js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -4626,6 +4679,14 @@ pretty-format@^29.0.0, pretty-format@^29.7.0:
     "@jest/schemas" "^29.6.3"
     ansi-styles "^5.0.0"
     react-is "^18.0.0"
+
+prisma@^6.8.0:
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/prisma/-/prisma-6.8.0.tgz#8b5ed353a1d3112a846fb04dd3ca3a48a2a8884f"
+  integrity sha512-Jv1DrZs4DhL4b0URa0cMtY4VRYrlGTbTAPjEITvYG7KjfC0yUPXxH8ZvPnLj0jolbJnR7aMqA1Ait9J1KG2GCA==
+  dependencies:
+    "@prisma/config" "6.8.0"
+    "@prisma/engines" "6.8.0"
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
@@ -5610,6 +5671,7 @@ word-wrap@^1.2.5:
   integrity sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
