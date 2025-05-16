@@ -37,7 +37,6 @@ export class UsersService {
         name: userData.name,
         surname: userData.surname,
         phone: userData.phone,
-        role: userData.role,
       }
     })
   }
@@ -60,6 +59,20 @@ export class UsersService {
         id: Number(userId)
       },
       data: updateData,
+    })
+  }
+
+  async registerUser(userData: CreateUserDto): Promise<User> {
+    const passwordHash = await this.hashPassword(userData.password);
+
+    return this.prismaService.user.create({
+      data: {
+        email: userData.email,
+        password: passwordHash,
+        name: userData.name,
+        surname: userData.surname,
+        phone: userData.phone,
+      }
     })
   }
 }
