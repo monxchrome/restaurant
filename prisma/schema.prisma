@@ -15,6 +15,7 @@ model User {
   surname   String
   phone     String
   role      Role     @default(WAITER)
+  pushToken String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]

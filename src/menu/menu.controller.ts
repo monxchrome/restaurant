@@ -24,7 +24,7 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get()
-  async getMenu(@Req() req: any, @Res() res: any) {
+  async getAll(@Req() req: any, @Res() res: any) {
     return res.status(HttpStatus.ACCEPTED).json(await this.menuService.getAll())
   }
 
@@ -33,7 +33,7 @@ export class MenuController {
   async getById(
     @Req() req: any,
     @Res() res: any,
-    @Param('menu_id') menuId: number
+    @Param('menuId') menuId: number
   ) {
     return res
       .status(HttpStatus.FOUND)
