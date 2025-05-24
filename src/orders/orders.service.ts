@@ -2,25 +2,30 @@ import { Injectable } from '@nestjs/common';
 import { OrderDto } from './dto/order.dto';
 import { Order } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prismaService: PrismaService,) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
-  async getAll() {
-    return this.prismaService.user.findMany();
+  async getAll(): Promise<Order[]> {
+    return this.prismaService.order.findMany({
+      include: { items: true },
+    });
   }
 
-  async getById(orderId: number) {
-    return this.prismaService.user.findUnique({
-      where: {
-        id: Number(orderId),
-      }
-    })
+  async getById(orderId: number): Promise<Order | null> {
+    return this.prismaService.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
   }
 
   async create(data: OrderDto): Promise<Order> {
-    return this.prismaService.order.create({
+    const order = await this.prismaService.order.create({
       data: {
         clientName: data.clientName,
         clientSurname: data.clientSurname,
@@ -30,33 +35,69 @@ export class OrdersService {
         waiterId: data.waiterId ?? null,
         totalPrice: data.totalPrice,
         items: {
-          create: data.items.map((item) => ({
+          create: data.items.map(item => ({
             menuItemId: item.menuItemId,
             quantity: item.quantity,
             price: item.price,
           })),
         },
       },
-      include: {
-        items: true,
-      },
+      include: { items: true },
+    });
+
+    const adminTokens = await this.getAdminFcmTokens();
+    for (const token of adminTokens) {
+      await this.notificationService.sendNotification(
+        token,
+        'Новый заказ',
+        `Создан заказ от ${order.clientName} ${order.clientSurname}`,
+      );
+    }
+
+    return order;
+  }
+
+  async updateOrder(orderId: number, updateData): Promise<Order> {
+    const updatedOrder = await this.prismaService.order.update({
+      where: { id: orderId },
+      data: updateData,
+      include: { items: true },
+    });
+
+    if (updatedOrder.waiterId) {
+      const waiterToken = await this.getWaiterFcmToken(updatedOrder.waiterId);
+      if (waiterToken) {
+        await this.notificationService.sendNotification(
+          waiterToken,
+          'Обновлен статус заказа',
+          `Статус заказа #${orderId} изменён на ${updatedOrder.status}`,
+        );
+      }
+    }
+
+    return updatedOrder;
+  }
+
+  async deleteOrder(orderId: number): Promise<Order> {
+    return this.prismaService.order.delete({
+      where: { id: orderId },
     });
   }
 
-  async deleteOrder(orderId: number) {
-    return this.prismaService.order.delete({
-      where: {
-        id: Number(orderId),
-      }
-    })
+  private async getAdminFcmTokens(): Promise<string[]> {
+    const admins = await this.prismaService.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { pushToken: true },
+    });
+
+    return admins.map(a => a.pushToken).filter(Boolean) as string[];
   }
 
-  async updateOrder(orderId: number, updateData) {
-    return this.prismaService.order.update({
-      where: {
-        id: Number(orderId)
-      },
-      data: updateData
-    })
+  private async getWaiterFcmToken(waiterId: number): Promise<string | null> {
+    const waiter = await this.prismaService.user.findUnique({
+      where: { id: waiterId },
+      select: { pushToken: true },
+    });
+    return waiter?.pushToken ?? null;
   }
 }
