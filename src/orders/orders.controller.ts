@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
@@ -57,5 +70,50 @@ export class OrdersController {
     return res
       .status(HttpStatus.ACCEPTED)
       .json(await this.ordersService.updateOrder(orderId, body))
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/status')
+  async ordersCountByStatus(
+    @Res() res: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const data = await this.ordersService.getOrdersCountByStatus(startDate, endDate);
+    return res.status(HttpStatus.OK).json(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/count-by-day')
+  async ordersCountByDay(
+    @Res() res: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const data = await this.ordersService.getOrdersCountByDay(startDate, endDate);
+    return res.status(HttpStatus.OK).json(data);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/revenue-by-day')
+  async revenueByDay(
+    @Res() res: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const data = await this.ordersService.getRevenueByDay(startDate, endDate);
+    return res.status(HttpStatus.OK).json(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/average-check')
+  async averageCheck(
+    @Res() res: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const avg = await this.ordersService.getAverageCheck(startDate, endDate);
+    return res.status(HttpStatus.OK).json({ averageCheck: avg });
   }
 }

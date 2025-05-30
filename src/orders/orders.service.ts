@@ -4,6 +4,9 @@ import { Order } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
 
+import { Prisma } from '@prisma/client';
+
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -99,5 +102,74 @@ export class OrdersService {
       select: { pushToken: true },
     });
     return waiter?.pushToken ?? null;
+  }
+
+  private buildDateFilter(startDate?: string, endDate?: string) {
+    const filter: any = {};
+    if (startDate && endDate) {
+      filter.gte = new Date(startDate);
+      filter.lte = new Date(endDate);
+    } else if (startDate) {
+      filter.gte = new Date(startDate);
+    } else if (endDate) {
+      filter.lte = new Date(endDate);
+    }
+    return Object.keys(filter).length ? filter : undefined;
+  }
+
+  async getOrdersCountByStatus(startDate?: string, endDate?: string) {
+    const dateFilter = this.buildDateFilter(startDate, endDate);
+    return this.prismaService.order.groupBy({
+      by: ['status'],
+      where: {
+        ...(dateFilter && { createdAt: dateFilter }),
+      },
+      _count: { id: true },
+    });
+  }
+
+  async getOrdersCountByDay(startDate?: string, endDate?: string) {
+    const dateFilter = this.buildDateFilter(startDate, endDate);
+
+    return this.prismaService.$queryRaw<
+      { day: string; count: number }[]
+    >`
+      SELECT
+        TO_CHAR("createdAt", 'YYYY-MM-DD') AS day,
+        COUNT(*) AS count
+      FROM "Order"
+      WHERE
+        ${dateFilter ? Prisma.sql`"createdAt" BETWEEN ${dateFilter.gte ?? new Date(0)} AND ${dateFilter.lte ?? new Date()}` : Prisma.sql`TRUE`}
+      GROUP BY day
+      ORDER BY day ASC;
+    `;
+  }
+
+  async getRevenueByDay(startDate?: string, endDate?: string) {
+    const dateFilter = this.buildDateFilter(startDate, endDate);
+
+    return this.prismaService.$queryRaw<
+      { day: string; revenue: number }[]
+    >`
+      SELECT
+        TO_CHAR("createdAt", 'YYYY-MM-DD') AS day,
+        SUM("totalPrice") AS revenue
+      FROM "Order"
+      WHERE
+        ${dateFilter ? Prisma.sql`"createdAt" BETWEEN ${dateFilter.gte ?? new Date(0)} AND ${dateFilter.lte ?? new Date()}` : Prisma.sql`TRUE`}
+      GROUP BY day
+      ORDER BY day ASC;
+    `;
+  }
+
+  async getAverageCheck(startDate?: string, endDate?: string) {
+    const dateFilter = this.buildDateFilter(startDate, endDate);
+    const result = await this.prismaService.order.aggregate({
+      where: {
+        ...(dateFilter && { createdAt: dateFilter }),
+      },
+      _avg: { totalPrice: true },
+    });
+    return result._avg.totalPrice ?? 0;
   }
 }
