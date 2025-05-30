@@ -8,7 +8,7 @@ import {
   Patch, Post,
   Req,
   Res,
-  UploadedFiles,
+  UploadedFiles, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
@@ -17,9 +17,11 @@ import { DRYFileName, imageFileFilter } from '../core/file-upload/file-upload';
 import { CreateMenuItemDto } from './dto/menuItem.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('MenuItem')
 @Controller('menu')
+@UseGuards(JwtAuthGuard)
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
@@ -40,6 +42,7 @@ export class MenuController {
       .json(await this.menuService.getById(menuId))
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'menuId', required: true })
   @Delete('/:menuId')
   async deleteMenuItem(
@@ -52,7 +55,7 @@ export class MenuController {
       .json(await this.menuService.deleteMenuItem(menuId))
   }
 
-
+  @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -81,6 +84,7 @@ export class MenuController {
       .json(await this.menuService.createMenuItem(body));
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'menuId', required: true })
   @Patch('/:menuId')
   @UseInterceptors(

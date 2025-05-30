@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(@Req() req: any, @Res() res: any) {
     return res.status(HttpStatus.ACCEPTED).json(await this.ordersService.getAll());
@@ -24,6 +26,7 @@ export class OrdersController {
       .json(await this.ordersService.getById(orderId))
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'orderId', required: true })
   @Delete('/:orderId')
   async deleteById(
@@ -42,6 +45,7 @@ export class OrdersController {
       .json(await this.ordersService.create(body))
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'orderId', required: true })
   @Patch('/:orderId')
   async updateOrder(
