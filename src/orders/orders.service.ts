@@ -172,4 +172,23 @@ export class OrdersService {
     });
     return result._avg.totalPrice ?? 0;
   }
+
+  async getSummaryStats(startDate?: string, endDate?: string) {
+    const [countByStatus, revenueByDay, averageCheck] = await Promise.all([
+      this.getOrdersCountByStatus(startDate, endDate),
+      this.getRevenueByDay(startDate, endDate),
+      this.getAverageCheck(startDate, endDate),
+    ]);
+
+    const totalOrders = countByStatus.reduce((sum, item) => sum + item._count.id, 0);
+
+    const totalRevenue = revenueByDay.reduce((sum, item) => sum + Number(item.revenue), 0);
+
+    return {
+      totalOrders,
+      countByStatus,
+      totalRevenue,
+      averageCheck,
+    };
+  }
 }

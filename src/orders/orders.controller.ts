@@ -116,4 +116,16 @@ export class OrdersController {
     const avg = await this.ordersService.getAverageCheck(startDate, endDate);
     return res.status(HttpStatus.OK).json({ averageCheck: avg });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats/summary')
+  async getSummaryStats(
+    @Res() res: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    const data = await this.ordersService.getSummaryStats(startDate, endDate);
+    return res.status(HttpStatus.OK).json(data);
+  }
+
 }
