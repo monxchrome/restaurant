@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { OrderDto } from './dto/order.dto';
+import { CreateOrderDto, UpdateOrderDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('Orders')
@@ -52,10 +53,13 @@ export class OrdersController {
   }
 
   @Post()
-  async createOrder(@Req() req: any, @Res() res: any, @Body() body: OrderDto) {
-    return res
-      .status(HttpStatus.CREATED)
-      .json(await this.ordersService.create(body))
+  async createOrder(@Req() req: any, @Res() res: any, @Body() body: CreateOrderDto) {
+    try {
+      const order = await this.ordersService.create(body);
+      return res.status(HttpStatus.CREATED).json(order);
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -65,7 +69,11 @@ export class OrdersController {
     @Req() req: any,
     @Res() res: any,
     @Param('orderId') orderId: number,
-    @Body() body: OrderDto) {
+    @Body() body: UpdateOrderDto) {
+
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('No update data provided');
+    }
 
     return res
       .status(HttpStatus.ACCEPTED)
@@ -91,8 +99,15 @@ export class OrdersController {
     @Query('endDate') endDate?: string,
   ) {
     const data = await this.ordersService.getOrdersCountByDay(startDate, endDate);
-    return res.status(HttpStatus.OK).json(data);
+
+    const transformed = data.map(item => ({
+      ...item,
+      count: typeof item.count === 'bigint' ? Number(item.count) : item.count,
+    }));
+
+    return res.status(HttpStatus.OK).json(transformed);
   }
+
 
 
   @UseGuards(JwtAuthGuard)

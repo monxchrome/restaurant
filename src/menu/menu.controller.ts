@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -14,7 +15,7 @@ import {
 import { MenuService } from './menu.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { DRYFileName, imageFileFilter } from '../core/file-upload/file-upload';
-import { CreateMenuItemDto } from './dto/menuItem.dto';
+import { CreateMenuItemDto, UpdateMenuItemDto } from './dto/menuItem.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -76,7 +77,7 @@ export class MenuController {
     @UploadedFiles() files: { image?: Express.Multer.File[] },
   ) {
     if (files?.image?.[0]) {
-      body.image = `/public/menuItems/${files.image[0].filename}`;
+      body.imageUrl = `/public/menuItems/${files.image[0].filename}`;
     }
 
     return res
@@ -105,11 +106,15 @@ export class MenuController {
     @Req() req: any,
     @Res() res: any,
     @Param('menuId') menuId: number,
-    @Body() body: CreateMenuItemDto,
+    @Body() body: UpdateMenuItemDto,
     @UploadedFiles()  files: { image?: Express.Multer.File[] },
   ) {
-    if (files?.image) {
-      body.image = `/public/menuItems/${files[0].filename}`;
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('No update data provided');
+    }
+
+    if (files?.image?.[0]) {
+      body.imageUrl = `/public/menuItems/${files.image[0].filename}`;
     }
 
     return res

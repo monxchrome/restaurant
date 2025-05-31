@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, IsPositive } from 'class-validator';
 
 export class CreateMenuItemDto {
@@ -19,5 +19,29 @@ export class CreateMenuItemDto {
   @ApiProperty({ example: 'image.jpg', description: 'Фото блюда', required: false })
   @IsOptional()
   @IsString()
-  image?: string;
+  imageUrl?: string;
 }
+
+export class UpdateMenuItemDto {
+  @ApiPropertyOptional({ example: 'Цезарь с курицей' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ example: 'Салат с курицей, пармезаном и соусом Цезарь' })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiPropertyOptional({ example: 350 })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  price?: number;
+
+  @ApiPropertyOptional({ example: 'image.jpg' })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+}
+

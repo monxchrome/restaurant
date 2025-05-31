@@ -27,7 +27,7 @@ export class MenuService {
         name: data.name,
         description: data.description,
         price: data.price,
-        imageUrl: data.image,
+        imageUrl: data.imageUrl,
       }
     });
   }

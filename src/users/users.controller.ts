@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('Users')
@@ -58,8 +71,12 @@ export class UsersController {
     @Req() req: any,
     @Res() res: any,
     @Param('userId') userId: number,
-    @Body() body: CreateUserDto
+    @Body() body: UpdateUserDto
   ) {
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('No update data provided');
+    }
+
     return res
       .status(HttpStatus.ACCEPTED)
       .json(await this.usersService.updateUser(userId, body))

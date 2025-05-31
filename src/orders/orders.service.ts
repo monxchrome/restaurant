@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { OrderDto } from './dto/order.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
 
 import { Prisma } from '@prisma/client';
+import { CreateOrderDto } from './dto/order.dto';
 
 
 @Injectable()
@@ -22,12 +22,12 @@ export class OrdersService {
 
   async getById(orderId: number): Promise<Order | null> {
     return this.prismaService.order.findUnique({
-      where: { id: orderId },
+      where: { id: Number(orderId) },
       include: { items: true },
     });
   }
 
-  async create(data: OrderDto): Promise<Order> {
+  async create(data: CreateOrderDto): Promise<Order> {
     const order = await this.prismaService.order.create({
       data: {
         clientName: data.clientName,
@@ -61,9 +61,17 @@ export class OrdersService {
   }
 
   async updateOrder(orderId: number, updateData): Promise<Order> {
+    const data: any = {
+      status: updateData.status,
+    };
+
+    if (updateData.waiterId) {
+      data.waiter = { connect: { id: updateData.waiterId } };
+    }
+
     const updatedOrder = await this.prismaService.order.update({
-      where: { id: orderId },
-      data: updateData,
+      where: { id: Number(orderId) },
+      data,
       include: { items: true },
     });
 
@@ -82,10 +90,23 @@ export class OrdersService {
   }
 
   async deleteOrder(orderId: number): Promise<Order> {
+    const existingOrder = await this.prismaService.order.findUnique({
+      where: { id: Number(orderId) },
+    });
+
+    if (!existingOrder) {
+      throw new NotFoundException(`Order with id ${orderId} not found`);
+    }
+
+    await this.prismaService.orderItem.deleteMany({
+      where: { id: Number(orderId) },
+    });
+
     return this.prismaService.order.delete({
-      where: { id: orderId },
+      where: { id: Number(orderId) },
     });
   }
+
 
   private async getAdminFcmTokens(): Promise<string[]> {
     const admins = await this.prismaService.user.findMany({
