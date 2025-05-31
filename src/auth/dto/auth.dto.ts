@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, Matches, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -56,7 +56,7 @@ export class RegisterDto {
     example: '+1234567890',
     description: 'User phone number',
   })
-  @IsPhoneNumber()
+  @Matches(/^\+\d{10,15}$/, { message: 'Invalid phone number format' })
   phone: string;
 
   @ApiProperty({

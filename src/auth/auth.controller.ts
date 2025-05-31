@@ -53,7 +53,7 @@ export class AuthController {
       console.log(e)
     }
 
-    if (!findUser) {
+    if (findUser) {
       return res
         .status(HttpStatus.FORBIDDEN)
         .json({ message: 'User is already exist' })
@@ -68,7 +68,7 @@ export class AuthController {
     });
 
     if (user) {
-      const token = await this.authService.signIn(findUser.id.toString());
+      const token = await this.authService.signIn(user.id.toString());
 
       return res.status(HttpStatus.OK).json({ token })
     }

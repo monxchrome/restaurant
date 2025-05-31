@@ -22,7 +22,7 @@ export class UsersService {
   }
 
   async getByEmail(email: string) {
-    return this.prismaService.user.findUnique({
+    return this.prismaService.user.findFirst({
       where: {
         email: email,
       }

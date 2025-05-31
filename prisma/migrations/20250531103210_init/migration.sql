@@ -13,6 +13,7 @@ CREATE TABLE "User" (
     "surname" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'WAITER',
+    "pushToken" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
