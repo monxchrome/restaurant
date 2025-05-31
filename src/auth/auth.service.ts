@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    @Inject(JwtService) private readonly defaultJwtService: JwtService,
   ) {
   }
   async compareHash(bodyPassword: string, hash: string): Promise<boolean> {
@@ -14,6 +15,16 @@ export class AuthService {
   }
 
   async signIn(userId: string) {
-    return this.jwtService.sign({id: userId})
+    return this.jwtService.sign({ id: userId })
+  }
+
+  async generateRefreshToken(userId: string) {
+    return this.jwtService.sign(
+      { id: userId },
+      {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+      },
+    );
   }
 }

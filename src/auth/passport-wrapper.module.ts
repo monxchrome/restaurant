@@ -1,6 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ConfigModule } from '@nestjs/config';
+
 import * as process from 'process';
 
 import { UsersModule } from '../users/users.module';
@@ -15,6 +17,7 @@ import { BearerStrategy } from './bearer.strategy';
     AuthModule,
     PassportModule.register({ defaultStrategy: 'bearer' }),
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
         signOptions: {

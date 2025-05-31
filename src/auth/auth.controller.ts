@@ -35,8 +35,13 @@ export class AuthController {
     }
 
     if (await this.authService.compareHash(body.password, findUser.password)) {
-      const token = await this.authService.signIn(findUser.id.toString());
-      return res.status(HttpStatus.OK).json({ token })
+      const accessToken = await this.authService.signIn(findUser.id.toString());
+      const refreshToken = await this.authService.generateRefreshToken(findUser.id.toString());
+
+      return res.status(HttpStatus.OK).json({
+        accessToken,
+        refreshToken,
+      });
     }
 
     return res
