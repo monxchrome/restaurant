@@ -5,6 +5,7 @@ import { NotificationService } from '../notifications/notification.service';
 
 import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/order.dto';
+import { OrderGateway } from './order.gateway';
 
 
 @Injectable()
@@ -12,6 +13,7 @@ export class OrdersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly notificationService: NotificationService,
+    private readonly orderGateway: OrderGateway
   ) {}
 
   async getAll(): Promise<Order[]> {
@@ -48,6 +50,11 @@ export class OrdersService {
       include: { items: true },
     });
 
+    this.orderGateway.sendOrderUpdate({
+      type: 'CREATED',
+      order,
+    });
+
     const adminTokens = await this.getAdminFcmTokens();
     for (const token of adminTokens) {
       await this.notificationService.sendNotification(
@@ -73,6 +80,11 @@ export class OrdersService {
       where: { id: Number(orderId) },
       data,
       include: { items: true },
+    });
+
+    this.orderGateway.sendOrderUpdate({
+      type: 'UPDATED',
+      order: updatedOrder,
     });
 
     if (updatedOrder.waiterId) {
