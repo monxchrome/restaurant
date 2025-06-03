@@ -4,9 +4,10 @@ import { MenuController } from './menu.controller';
 import { PrismaModule } from '../core/orm/prisma.module';
 import { PrismaService } from '../core/orm/prisma.service';
 import { UsersService } from '../users/users.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AuthModule],
   controllers: [MenuController],
   providers: [MenuService, UsersService, PrismaService],
   exports: [MenuService],

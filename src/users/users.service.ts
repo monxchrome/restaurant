@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../core/orm/prisma.service';
 import { CreateUserDto } from './dto/user.dto';
 import { User } from '@prisma/client';
 
 import * as bcrypt from 'bcrypt';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly authService: AuthService,
+  ) {}
 
   async getAll() {
     return this.prismaService.user.findMany();
@@ -72,6 +76,38 @@ export class UsersService {
         name: userData.name,
         surname: userData.surname,
         phone: userData.phone,
+      }
+    })
+  }
+
+  async changePassword(userId: number, oldPassword: string, newPassword: string)
+  {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: Number(userId),
+      }
+    })
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const isMatched = await this.authService.compareHash(
+      oldPassword,
+      user.password
+    );
+
+    if (!isMatched) {
+      throw new BadRequestException('Old password does not match');
+    }
+
+    const hashNewPassword = await this.hashPassword(newPassword);
+    await this.prismaService.user.update({
+      where: {
+        id: Number(userId)
+      },
+      data: {
+        password: hashNewPassword,
       }
     })
   }

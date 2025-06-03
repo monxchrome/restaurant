@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
@@ -63,6 +63,35 @@ export class UsersController {
     return res
       .status(HttpStatus.FOUND)
       .json(await this.usersService.deleteUser(userId))
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        oldPassword: { type: 'string' },
+        newPassword: { type: 'string' },
+      },
+      required: ['oldPassword', 'newPassword'],
+    },
+  })
+  @Post('/changePassword')
+  async changePassword(
+    @Req() req: any,
+    @Body('oldPassword') oldPassword: string,
+    @Body('newPassword') newPassword: string,
+    @Res() res: any,
+  ) {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'User not authenticated' });
+    }
+
+    return res
+      .status(HttpStatus.ACCEPTED)
+      .json(await this.usersService.changePassword(userId, oldPassword, newPassword))
   }
 
   @ApiParam({name: 'userId', required: true})
