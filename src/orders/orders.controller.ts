@@ -23,10 +23,13 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@Req() req: any, @Res() res: any) {
-    return res.status(HttpStatus.ACCEPTED).json(await this.ordersService.getAll());
+  async getAll(@Query('page') page = '1', @Query('pageSize') pageSize = '10', @Res() res) {
+    const pageNum = parseInt(page);
+    const pageSizeNum = parseInt(pageSize);
+
+    const result = await this.ordersService.getAll(pageNum, pageSizeNum);
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @ApiParam({ name: 'orderId', required: true })
@@ -78,6 +81,24 @@ export class OrdersController {
     return res
       .status(HttpStatus.ACCEPTED)
       .json(await this.ordersService.updateOrder(orderId, body))
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({ name: 'orderId', required: true })
+  @Patch('/:orderId/status')
+  async updateOrderStatus(
+    @Req() req: any,
+    @Res() res: any,
+    @Param('orderId') orderId: number,
+    @Body() body: UpdateOrderDto) {
+
+    if (!body || Object.keys(body).length === 0) {
+      throw new BadRequestException('No update data provided');
+    }
+
+    return res
+      .status(HttpStatus.ACCEPTED)
+      .json(await this.ordersService.updateOrderStatus(orderId, body))
   }
 
   @UseGuards(JwtAuthGuard)

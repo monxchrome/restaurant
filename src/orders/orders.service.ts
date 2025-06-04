@@ -16,10 +16,24 @@ export class OrdersService {
     private readonly orderGateway: OrderGateway
   ) {}
 
-  async getAll(): Promise<Order[]> {
-    return this.prismaService.order.findMany({
-      include: { items: true },
-    });
+  async getAll(page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize;
+    const [orders, total] = await Promise.all([
+      this.prismaService.order.findMany({
+        skip,
+        take: pageSize,
+        include: { items: true },
+        orderBy: { id: 'desc' },
+      }),
+      this.prismaService.order.count(),
+    ]);
+
+    return {
+      orders,
+      total,
+      page,
+      pageSize,
+    };
   }
 
   async getById(orderId: number): Promise<Order | null> {
@@ -67,7 +81,7 @@ export class OrdersService {
     return order;
   }
 
-  async updateOrder(orderId: number, updateData): Promise<Order> {
+  async updateOrderStatus(orderId: number, updateData): Promise<Order> {
     const data: any = {
       status: updateData.status,
     };
@@ -97,6 +111,21 @@ export class OrdersService {
         );
       }
     }
+
+    return updatedOrder;
+  }
+
+  async updateOrder(orderId: number, updateData): Promise<Order> {
+    const updatedOrder = await this.prismaService.order.update({
+      where: { id: Number(orderId) },
+      data: updateData,
+      include: { items: true },
+    });
+
+    this.orderGateway.sendOrderUpdate({
+      type: 'UPDATED',
+      order: updatedOrder,
+    });
 
     return updatedOrder;
   }

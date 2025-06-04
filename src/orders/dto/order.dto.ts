@@ -1,7 +1,21 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Matches,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+
+const NAME_REGEX = /^[A-Za-zА-Яа-яЁё\s'-]+$/; // разрешаем буквы, пробел, апостроф и дефис
 
 export class OrderItemDto {
   @ApiProperty()
@@ -10,10 +24,12 @@ export class OrderItemDto {
 
   @ApiProperty()
   @IsNumber()
+  @Min(1, { message: 'Количество должно быть не меньше 1' })
   quantity: number;
 
   @ApiProperty()
   @IsNumber()
+  @Min(0, { message: 'Цена не может быть отрицательной' })
   price: number;
 }
 
@@ -21,21 +37,27 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Matches(NAME_REGEX, { message: 'Имя содержит недопустимые символы' })
+  @MaxLength(50)
   clientName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @Matches(NAME_REGEX, { message: 'Фамилия содержит недопустимые символы' })
+  @MaxLength(50)
   clientSurname: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @IsPhoneNumber('RU', { message: 'Некорректный формат телефона' })
   clientPhone: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   deliveryAddress?: string;
 
   @ApiProperty({ required: false, nullable: true })
@@ -45,8 +67,8 @@ export class CreateOrderDto {
 
   @ApiProperty()
   @IsNumber()
+  @Min(0)
   totalPrice: number;
-
 
   @ApiProperty({ enum: OrderStatus, default: OrderStatus.PENDING, required: false })
   @IsEnum(OrderStatus)
@@ -68,11 +90,13 @@ export class UpdateOrderItemDto {
 
   @ApiPropertyOptional()
   @IsNumber()
+  @Min(1)
   @IsOptional()
   quantity?: number;
 
   @ApiPropertyOptional()
   @IsNumber()
+  @Min(0)
   @IsOptional()
   price?: number;
 }
@@ -81,21 +105,27 @@ export class UpdateOrderDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @Matches(NAME_REGEX, { message: 'Имя содержит недопустимые символы' })
+  @MaxLength(50)
   clientName?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @Matches(NAME_REGEX, { message: 'Фамилия содержит недопустимые символы' })
+  @MaxLength(50)
   clientSurname?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @IsPhoneNumber('RU', { message: 'Некорректный формат телефона' })
   clientPhone?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   deliveryAddress?: string;
 
   @ApiPropertyOptional()
@@ -105,6 +135,7 @@ export class UpdateOrderDto {
 
   @ApiPropertyOptional()
   @IsNumber()
+  @Min(0)
   @IsOptional()
   totalPrice?: number;
 
