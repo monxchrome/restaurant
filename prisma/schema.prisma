@@ -19,6 +19,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Order     Order[]
+  Token     Token[]
 }
 
 enum Role {
@@ -68,4 +69,13 @@ enum OrderStatus {
   DELIVERING
   DELIVERED
   CANCELLED
+}
+
+model Token {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  refreshToken String
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
 }
