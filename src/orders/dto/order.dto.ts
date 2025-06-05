@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { OrderStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -15,7 +14,16 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-const NAME_REGEX = /^[A-Za-zА-Яа-яЁё\s'-]+$/; // разрешаем буквы, пробел, апостроф и дефис
+const NAME_REGEX = /^[A-Za-zА-Яа-яЁё\s'-]+$/;
+
+enum OrderStatus {
+  PENDING = 'PENDING',
+  PREPARING = 'PREPARING',
+  READY = 'READY',
+  DELIVERING = 'DELIVERING',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
 
 export class OrderItemDto {
   @ApiProperty()
@@ -138,6 +146,11 @@ export class UpdateOrderDto {
   @Min(0)
   @IsOptional()
   totalPrice?: number;
+
+  @ApiPropertyOptional({ enum: OrderStatus })
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 
   @ApiPropertyOptional({ type: [UpdateOrderItemDto] })
   @ValidateNested({ each: true })

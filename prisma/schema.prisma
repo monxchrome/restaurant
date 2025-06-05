@@ -60,6 +60,20 @@ model MenuItem {
   imageUrl    String?
   createdAt   DateTime    @default(now())
   orderItems  OrderItem[]
+  category    Category    @default(EXTRAS)
+  visible     Boolean     @default(true)
+  inStock     Boolean     @default(true)
+}
+
+enum Category {
+  SALADS_AND_SNACKS
+  SOUPS
+  GRILL_DISHES
+  MAIN_HOT_DISHES
+  PIZZA_AND_PIES
+  DESSERTS
+  DRINKS
+  EXTRAS
 }
 
 enum OrderStatus {

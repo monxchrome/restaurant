@@ -6,7 +6,7 @@ import {
   Get,
   HttpStatus,
   Param,
-  Patch, Post,
+  Patch, Post, Query,
   Req,
   Res,
   UploadedFiles, UseGuards,
@@ -27,8 +27,14 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get()
-  async getAll(@Req() req: any, @Res() res: any) {
-    return res.status(HttpStatus.ACCEPTED).json(await this.menuService.getAll())
+  async getAll(
+    @Req() req: any,
+    @Res() res: any,
+    @Query('category') category?: string
+  ) {
+    return res
+      .status(HttpStatus.ACCEPTED)
+      .json(await this.menuService.getAll(category));
   }
 
   @ApiParam({ name: 'menuId', required: true })

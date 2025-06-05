@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../core/orm/prisma.service';
 import { CreateMenuItemDto } from './dto/menuItem.dto';
-import { MenuItem } from '@prisma/client';
+import { Category, MenuItem } from '@prisma/client';
 
 @Injectable()
 export class MenuService {
@@ -9,9 +9,16 @@ export class MenuService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async getAll() {
-    return this.prismaService.menuItem.findMany();
+  async getAll(category?: string) {
+    let where = {};
+
+    if (category && Object.values(Category).includes(category as Category)) {
+      where = { category: category as Category };
+    }
+
+    return this.prismaService.menuItem.findMany({ where });
   }
+
 
   async getById(menuId: number) {
     return this.prismaService.menuItem.findUnique({
@@ -28,6 +35,9 @@ export class MenuService {
         description: data.description,
         price: data.price,
         imageUrl: data.imageUrl,
+        category: data.category,
+        visible: data.visible,
+        inStock: data.inStock
       }
     });
   }

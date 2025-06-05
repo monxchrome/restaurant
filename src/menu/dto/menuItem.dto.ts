@@ -1,12 +1,23 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNumber, IsPositive } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsPositive, IsEnum, IsBoolean } from 'class-validator';
+
+enum Category {
+  SALADS_AND_SNACKS = 'SALADS_AND_SNACKS',
+  SOUPS = 'SOUPS',
+  GRILL_DISHES = 'GRILL_DISHES',
+  MAIN_HOT_DISHES = 'MAIN_HOT_DISHES',
+  PIZZA_AND_PIES = 'PIZZA_AND_PIES',
+  DESSERTS = 'DESSERTS',
+  DRINKS = 'DRINKS',
+  EXTRAS = 'EXTRAS'
+}
 
 export class CreateMenuItemDto {
   @ApiProperty({ example: 'Цезарь с курицей', description: 'Название блюда' })
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 'Салат с курицей, пармезаном и соусом Цезарь', description: 'Описание блюда', required: false })
+  @ApiProperty({ example: 'Салат с курицей, пармезаном и соусом Цезарь', required: false })
   @IsOptional()
   @IsString()
   description?: string;
@@ -16,10 +27,22 @@ export class CreateMenuItemDto {
   @IsPositive()
   price: number;
 
-  @ApiProperty({ example: 'image.jpg', description: 'Фото блюда', required: false })
+  @ApiProperty({ example: 'image.jpg', required: false })
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @ApiProperty({ enum: Category, default: Category.EXTRAS, description: 'Категория блюда' })
+  @IsEnum(Category)
+  category: Category;
+
+  @ApiProperty({ example: true, required: false })
+  @IsBoolean()
+  visible?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsBoolean()
+  inStock?: boolean;
 }
 
 export class UpdateMenuItemDto {
@@ -43,5 +66,17 @@ export class UpdateMenuItemDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
-}
 
+  @ApiPropertyOptional({ enum: Category, default: Category.EXTRAS })
+  @IsOptional()
+  @IsEnum(Category)
+  category?: Category;
+
+  @ApiProperty({ example: true, required: false })
+  @IsBoolean()
+  visible?: boolean;
+
+  @ApiProperty({ example: true, required: false })
+  @IsBoolean()
+  inStock?: boolean;
+}
