@@ -23,6 +23,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     PassportModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
     }),
   ],
   controllers: [AppController],

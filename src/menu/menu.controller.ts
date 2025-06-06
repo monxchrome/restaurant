@@ -30,11 +30,25 @@ export class MenuController {
   async getAll(
     @Req() req: any,
     @Res() res: any,
-    @Query('category') category?: string
+    @Query('category') category?: string,
+    @Query('visible') visible?: string,
+    @Query('inStock') inStock?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('sortBy') sortBy?: 'name' | 'price' | 'createdAt',
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc'
   ) {
-    return res
-      .status(HttpStatus.ACCEPTED)
-      .json(await this.menuService.getAll(category));
+    const result = await this.menuService.getAll({
+      category,
+      visible: visible === 'true' ? true : visible === 'false' ? false : undefined,
+      inStock: inStock === 'true' ? true : inStock === 'false' ? false : undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      sortBy,
+      sortOrder,
+    });
+
+    return res.status(HttpStatus.OK).json(result);
   }
 
   @ApiParam({ name: 'menuId', required: true })

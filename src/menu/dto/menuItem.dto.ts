@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, IsPositive, IsEnum, IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 enum Category {
   SALADS_AND_SNACKS = 'SALADS_AND_SNACKS',
@@ -25,6 +26,7 @@ export class CreateMenuItemDto {
   @ApiProperty({ example: 350, description: 'Цена блюда в рублях' })
   @IsNumber()
   @IsPositive()
+  @Transform(({ value }) => Number(value))
   price: number;
 
   @ApiProperty({ example: 'image.jpg', required: false })
@@ -38,10 +40,12 @@ export class CreateMenuItemDto {
 
   @ApiProperty({ example: true, required: false })
   @IsBoolean()
+  @Transform(({ value }) => value === 'true')
   visible?: boolean;
 
   @ApiProperty({ example: true, required: false })
   @IsBoolean()
+  @Transform(({ value }) => value === 'true')
   inStock?: boolean;
 }
 
@@ -60,6 +64,7 @@ export class UpdateMenuItemDto {
   @IsOptional()
   @IsNumber()
   @IsPositive()
+  @Transform(({ value }) => value !== undefined ? Number(value) : value)
   price?: number;
 
   @ApiPropertyOptional({ example: 'image.jpg' })
@@ -72,11 +77,15 @@ export class UpdateMenuItemDto {
   @IsEnum(Category)
   category?: Category;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiPropertyOptional({ example: true, required: false })
   @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
   visible?: boolean;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiPropertyOptional({ example: true, required: false })
   @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
   inStock?: boolean;
 }

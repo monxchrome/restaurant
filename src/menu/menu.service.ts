@@ -9,16 +9,52 @@ export class MenuService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async getAll(category?: string) {
-    let where = {};
+  async getAll(params?: {
+    category?: string;
+    visible?: boolean;
+    inStock?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+    sortBy?: 'name' | 'price' | 'createdAt';
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const {
+      category,
+      visible,
+      inStock,
+      minPrice,
+      maxPrice,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = params || {};
+
+    const where: any = {};
 
     if (category && Object.values(Category).includes(category as Category)) {
-      where = { category: category as Category };
+      where.category = category;
     }
 
-    return this.prismaService.menuItem.findMany({ where });
-  }
+    if (typeof visible === 'boolean') {
+      where.visible = visible;
+    }
 
+    if (typeof inStock === 'boolean') {
+      where.inStock = inStock;
+    }
+
+    if (typeof minPrice === 'number' || typeof maxPrice === 'number') {
+      where.price = {};
+      if (typeof minPrice === 'number') where.price.gte = minPrice;
+      if (typeof maxPrice === 'number') where.price.lte = maxPrice;
+    }
+
+    const orderBy = sortBy ? { [sortBy]: sortOrder } : undefined;
+
+    return this.prismaService.menuItem.findMany({
+      where,
+      orderBy,
+    });
+  }
 
   async getById(menuId: number) {
     return this.prismaService.menuItem.findUnique({
@@ -43,6 +79,10 @@ export class MenuService {
   }
 
   async deleteMenuItem(menuId: number) {
+    await this.prismaService.orderItem.deleteMany({
+      where: { menuItemId: Number(menuId) },
+    });
+
     return this.prismaService.menuItem.delete({
       where: {
         id: Number(menuId),

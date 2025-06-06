@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { extname } from 'path';
 
 export const DRYFileName = (req, file, callback) => {
   const name = file.originalname.split('.')[0];
+  const extension = extname(file.originalname);
   const randomName = Array(8)
     .fill(0)
-    .map(() => Math.round(Math.random() * 10).toString())
+    .map(() => Math.floor(Math.random() * 10).toString())
     .join('');
-  callback(null, `${name}${randomName}`);
+  callback(null, `${name}${randomName}${extension}`);
 };
 
 export const imageFileFilter = (req, file, callback) => {

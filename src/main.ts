@@ -15,11 +15,17 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
+
   const config = new DocumentBuilder()
     .setTitle('API Klever Gurme')
     .setDescription('Klever Gurme restaurant')
-    .setVersion('2.7.4-beta.4')
+    .setVersion('3.8.6-beta.6')
     .addTag('restaurant')
     .build();
   const document = SwaggerModule.createDocument(app, config);
