@@ -17,6 +17,7 @@ import { OrdersService } from './orders.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateOrderDto, UpdateOrderDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { Order, OrderStatus } from '@prisma/client';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -24,11 +25,31 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async getAll(@Query('page') page = '1', @Query('pageSize') pageSize = '10', @Res() res) {
+  async getAll(
+    @Req() req: any,
+    @Res() res: any,
+    @Query('page') page = '1',
+    @Query('pageSize') pageSize = '10',
+    @Query('status') status?: string,
+    @Query('clientName') clientName?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+  ) {
     const pageNum = parseInt(page);
     const pageSizeNum = parseInt(pageSize);
 
-    const result = await this.ordersService.getAll(pageNum, pageSizeNum);
+    const filters = {
+      status: status as OrderStatus | undefined,
+      clientName,
+    };
+
+    const sort = {
+      sortBy: sortBy as keyof Order | undefined,
+      sortOrder,
+    };
+
+    const result = await this.ordersService.getAll(pageNum, pageSizeNum, filters, sort);
+
     return res.status(HttpStatus.OK).json(result);
   }
 

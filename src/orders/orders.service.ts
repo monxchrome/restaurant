@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Order } from '@prisma/client';
+import { Order, OrderStatus } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
 
@@ -16,16 +16,47 @@ export class OrdersService {
     private readonly orderGateway: OrderGateway
   ) {}
 
-  async getAll(page: number, pageSize: number) {
+  async getAll(
+    page: number,
+    pageSize: number,
+    filters?: {
+      status?: OrderStatus | 'all';
+      clientName?: string;
+    },
+    sort?: {
+      sortBy?: keyof Order;
+      sortOrder?: 'asc' | 'desc';
+    }
+  ) {
     const skip = (page - 1) * pageSize;
+
+    const where: any = {};
+
+    if (filters?.status && filters.status !== 'all') {
+      where.status = filters.status;
+    }
+
+    if (filters?.clientName) {
+      where.clientName = { contains: filters.clientName, mode: 'insensitive' };
+    }
+
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+
+    if (sort?.sortBy) {
+      orderBy[sort.sortBy] = sort.sortOrder ?? 'asc';
+    } else {
+      orderBy['id'] = 'desc';
+    }
+
     const [orders, total] = await Promise.all([
       this.prismaService.order.findMany({
         skip,
         take: pageSize,
+        where,
         include: { items: true },
-        orderBy: { id: 'desc' },
+        orderBy,
       }),
-      this.prismaService.order.count(),
+      this.prismaService.order.count({ where }),
     ]);
 
     return {
