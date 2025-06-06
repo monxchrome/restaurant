@@ -95,6 +95,18 @@ export class AuthController {
       .json({ message: "ERROR.Failed_to_register_user" });
   }
 
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      expires: new Date(0),
+      path: '/',
+    });
+
+    return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
+  }
 
   @Post('refresh')
   async refresh(@Req() req: Request, @Res() res: Response) {
