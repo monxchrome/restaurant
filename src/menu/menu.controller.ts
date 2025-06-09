@@ -19,6 +19,8 @@ import { CreateMenuItemDto, UpdateMenuItemDto } from './dto/menuItem.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
 
 @ApiTags('MenuItem')
 @Controller('menu')
@@ -63,8 +65,9 @@ export class MenuController {
       .json(await this.menuService.getById(menuId))
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'menuId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete('/:menuId')
   async deleteMenuItem(
     @Req() req: any,
@@ -76,7 +79,8 @@ export class MenuController {
       .json(await this.menuService.deleteMenuItem(menuId))
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -105,8 +109,9 @@ export class MenuController {
       .json(await this.menuService.createMenuItem(body));
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'menuId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Patch('/:menuId')
   @UseInterceptors(
     FileFieldsInterceptor(

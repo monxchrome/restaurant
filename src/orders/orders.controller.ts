@@ -18,12 +18,16 @@ import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateOrderDto, UpdateOrderDto } from './dto/order.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { Order, OrderStatus } from '@prisma/client';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'WAITER')
   @Get()
   async getAll(
     @Req() req: any,
@@ -54,6 +58,8 @@ export class OrdersController {
   }
 
   @ApiParam({ name: 'orderId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'WAITER', 'USER')
   @Get('/:orderId')
   async getById(
     @Req() req: any,
@@ -64,8 +70,9 @@ export class OrdersController {
       .json(await this.ordersService.getById(orderId))
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'orderId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete('/:orderId')
   async deleteById(
     @Req() req: any,
@@ -86,8 +93,9 @@ export class OrdersController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'orderId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Patch('/:orderId')
   async updateOrder(
     @Req() req: any,
@@ -104,8 +112,9 @@ export class OrdersController {
       .json(await this.ordersService.updateOrder(orderId, body))
   }
 
-  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'orderId', required: true })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'WAITER')
   @Patch('/:orderId/status')
   async updateOrderStatus(
     @Req() req: any,
@@ -122,7 +131,8 @@ export class OrdersController {
       .json(await this.ordersService.updateOrderStatus(orderId, body))
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('stats/status')
   async ordersCountByStatus(
     @Res() res: any,
@@ -133,7 +143,8 @@ export class OrdersController {
     return res.status(HttpStatus.OK).json(data);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('stats/count-by-day')
   async ordersCountByDay(
     @Res() res: any,
@@ -152,7 +163,8 @@ export class OrdersController {
 
 
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('stats/revenue-by-day')
   async revenueByDay(
     @Res() res: any,
@@ -163,7 +175,8 @@ export class OrdersController {
     return res.status(HttpStatus.OK).json(data);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('stats/average-check')
   async averageCheck(
     @Res() res: any,
@@ -174,7 +187,8 @@ export class OrdersController {
     return res.status(HttpStatus.OK).json({ averageCheck: avg });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Get('stats/summary')
   async getSummaryStats(
     @Res() res: any,

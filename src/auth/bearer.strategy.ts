@@ -18,15 +18,19 @@ export class BearerStrategy extends PassportStrategy(Strategy, 'bearer') {
   }
 
   async validate(token: string): Promise<any> {
-    let user: User;
     try {
       const payload = await this.jwtService.verify(token);
-      console.log(payload);
-      user = await this.userService.getById(payload.id);
+      const user: User | null = await this.userService.getById(payload.id);
+
+      if (!user) throw new UnauthorizedException();
+
+      return {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      };
     } catch (e) {
-      console.log(new Date().toISOString(), token);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid or expired token');
     }
-    return user;
   }
 }

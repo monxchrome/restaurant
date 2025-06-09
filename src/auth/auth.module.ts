@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { BearerStrategy } from './bearer.strategy';
+import { TokenService } from './token.service';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { BearerStrategy } from './bearer.strategy';
     forwardRef(() => UsersModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, BearerStrategy],
+  providers: [AuthService, BearerStrategy, TokenService],
   exports: [AuthService]
 })
 export class AuthModule {}
