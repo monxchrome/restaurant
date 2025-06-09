@@ -10,9 +10,8 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private readonly prisma: PrismaService,
-    private tokenService: TokenService
-  ) {
-  }
+    private tokenService: TokenService,
+  ) {}
   async compareHash(bodyPassword: string, hash: string): Promise<boolean> {
     return bcrypt.compare(bodyPassword, hash);
   }
@@ -39,7 +38,10 @@ export class AuthService {
     try {
       const payload = this.jwtService.verify(refreshToken);
 
-      const tokenRecord = await this.tokenService.findValidToken(payload.id, refreshToken);
+      const tokenRecord = await this.tokenService.findValidToken(
+        payload.id,
+        refreshToken,
+      );
       if (!tokenRecord) {
         throw new UnauthorizedException('Refresh token not found or expired');
       }

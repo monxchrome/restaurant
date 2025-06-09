@@ -5,7 +5,11 @@ import { PrismaService } from '../core/orm/prisma.service';
 export class TokenService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: { userId: number; refreshToken: string; expiresAt: Date }) {
+  async create(data: {
+    userId: number;
+    refreshToken: string;
+    expiresAt: Date;
+  }) {
     return this.prisma.token.create({ data });
   }
 

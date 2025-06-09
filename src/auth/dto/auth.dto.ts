@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsNotEmpty, Matches, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  Matches,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
@@ -68,4 +74,3 @@ export class RegisterDto {
   @IsEnum(Role)
   role: Role;
 }
-

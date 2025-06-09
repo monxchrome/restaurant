@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -16,20 +25,26 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UsersService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
   ) {}
-
 
   @Post('login')
   async login(@Res() res: any, @Body() body: LoginDto) {
     if (!body.email || !body.password) {
-      return res.status(HttpStatus.FORBIDDEN).json({ message: "Email and password are required" });
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: 'Email and password are required' });
     }
 
     const findUser = await this.userService.getByEmail(body.email);
 
-    if (!findUser || !(await this.authService.compareHash(body.password, findUser.password))) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ message: "Email or password is incorrect" });
+    if (
+      !findUser ||
+      !(await this.authService.compareHash(body.password, findUser.password))
+    ) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Email or password is incorrect' });
     }
 
     const tokenPair = await this.authService.generateTokenPair(findUser.id);
@@ -54,13 +69,14 @@ export class AuthController {
     });
   }
 
-
   @Post('register')
   async register(@Res() res: any, @Body() body: RegisterDto) {
     const findUser = await this.userService.getByEmail(body.email.trim());
 
     if (findUser) {
-      return res.status(HttpStatus.FORBIDDEN).json({ message: 'User is already exist' });
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: 'User is already exist' });
     }
 
     const user = await this.userService.registerUser({
@@ -88,7 +104,7 @@ export class AuthController {
 
     return res
       .status(HttpStatus.BAD_REQUEST)
-      .json({ message: "ERROR.Failed_to_register_user" });
+      .json({ message: 'ERROR.Failed_to_register_user' });
   }
 
   @Post('logout')
@@ -106,7 +122,9 @@ export class AuthController {
     const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Missing refresh token' });
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'Missing refresh token' });
     }
 
     try {

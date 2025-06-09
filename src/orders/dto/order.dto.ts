@@ -78,7 +78,11 @@ export class CreateOrderDto {
   @Min(0)
   totalPrice: number;
 
-  @ApiProperty({ enum: OrderStatus, default: OrderStatus.PENDING, required: false })
+  @ApiProperty({
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
+    required: false,
+  })
   @IsEnum(OrderStatus)
   @IsOptional()
   status?: OrderStatus;

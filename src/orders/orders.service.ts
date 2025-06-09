@@ -1,19 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Order, OrderStatus } from '@prisma/client';
+import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
-
-import { Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/order.dto';
 import { OrderGateway } from './order.gateway';
-
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly notificationService: NotificationService,
-    private readonly orderGateway: OrderGateway
+    private readonly orderGateway: OrderGateway,
   ) {}
 
   async getAll(
@@ -26,7 +23,7 @@ export class OrdersService {
     sort?: {
       sortBy?: keyof Order;
       sortOrder?: 'asc' | 'desc';
-    }
+    },
   ) {
     const skip = (page - 1) * pageSize;
 
@@ -85,7 +82,7 @@ export class OrdersService {
         waiterId: data.waiterId ?? null,
         totalPrice: data.totalPrice,
         items: {
-          create: data.items.map(item => ({
+          create: data.items.map((item) => ({
             menuItemId: item.menuItemId,
             quantity: item.quantity,
             price: item.price,
@@ -179,37 +176,6 @@ export class OrdersService {
     });
   }
 
-
-  private async getAdminFcmTokens(): Promise<string[]> {
-    const admins = await this.prismaService.user.findMany({
-      where: { role: 'ADMIN' },
-      select: { pushToken: true },
-    });
-
-    return admins.map(a => a.pushToken).filter(Boolean) as string[];
-  }
-
-  private async getWaiterFcmToken(waiterId: number): Promise<string | null> {
-    const waiter = await this.prismaService.user.findUnique({
-      where: { id: waiterId },
-      select: { pushToken: true },
-    });
-    return waiter?.pushToken ?? null;
-  }
-
-  private buildDateFilter(startDate?: string, endDate?: string) {
-    const filter: any = {};
-    if (startDate && endDate) {
-      filter.gte = new Date(startDate);
-      filter.lte = new Date(endDate);
-    } else if (startDate) {
-      filter.gte = new Date(startDate);
-    } else if (endDate) {
-      filter.lte = new Date(endDate);
-    }
-    return Object.keys(filter).length ? filter : undefined;
-  }
-
   async getOrdersCountByStatus(startDate?: string, endDate?: string) {
     const dateFilter = this.buildDateFilter(startDate, endDate);
     return this.prismaService.order.groupBy({
@@ -224,9 +190,7 @@ export class OrdersService {
   async getOrdersCountByDay(startDate?: string, endDate?: string) {
     const dateFilter = this.buildDateFilter(startDate, endDate);
 
-    return this.prismaService.$queryRaw<
-      { day: string; count: number }[]
-    >`
+    return this.prismaService.$queryRaw<{ day: string; count: number }[]>`
       SELECT
         TO_CHAR("createdAt", 'YYYY-MM-DD') AS day,
         COUNT(*) AS count
@@ -241,9 +205,7 @@ export class OrdersService {
   async getRevenueByDay(startDate?: string, endDate?: string) {
     const dateFilter = this.buildDateFilter(startDate, endDate);
 
-    return this.prismaService.$queryRaw<
-      { day: string; revenue: number }[]
-    >`
+    return this.prismaService.$queryRaw<{ day: string; revenue: number }[]>`
       SELECT
         TO_CHAR("createdAt", 'YYYY-MM-DD') AS day,
         SUM("totalPrice") AS revenue
@@ -273,9 +235,15 @@ export class OrdersService {
       this.getAverageCheck(startDate, endDate),
     ]);
 
-    const totalOrders = countByStatus.reduce((sum, item) => sum + item._count.id, 0);
+    const totalOrders = countByStatus.reduce(
+      (sum, item) => sum + item._count.id,
+      0,
+    );
 
-    const totalRevenue = revenueByDay.reduce((sum, item) => sum + Number(item.revenue), 0);
+    const totalRevenue = revenueByDay.reduce(
+      (sum, item) => sum + Number(item.revenue),
+      0,
+    );
 
     return {
       totalOrders,
@@ -283,5 +251,35 @@ export class OrdersService {
       totalRevenue,
       averageCheck,
     };
+  }
+
+  private async getAdminFcmTokens(): Promise<string[]> {
+    const admins = await this.prismaService.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { pushToken: true },
+    });
+
+    return admins.map((a) => a.pushToken).filter(Boolean) as string[];
+  }
+
+  private async getWaiterFcmToken(waiterId: number): Promise<string | null> {
+    const waiter = await this.prismaService.user.findUnique({
+      where: { id: waiterId },
+      select: { pushToken: true },
+    });
+    return waiter?.pushToken ?? null;
+  }
+
+  private buildDateFilter(startDate?: string, endDate?: string) {
+    const filter: any = {};
+    if (startDate && endDate) {
+      filter.gte = new Date(startDate);
+      filter.lte = new Date(endDate);
+    } else if (startDate) {
+      filter.gte = new Date(startDate);
+    } else if (endDate) {
+      filter.lte = new Date(endDate);
+    }
+    return Object.keys(filter).length ? filter : undefined;
   }
 }

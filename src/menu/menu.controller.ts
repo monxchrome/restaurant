@@ -6,10 +6,13 @@ import {
   Get,
   HttpStatus,
   Param,
-  Patch, Post, Query,
+  Patch,
+  Post,
+  Query,
   Req,
   Res,
-  UploadedFiles, UseGuards,
+  UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
@@ -38,12 +41,14 @@ export class MenuController {
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('sortBy') sortBy?: 'name' | 'price' | 'createdAt',
-    @Query('sortOrder') sortOrder?: 'asc' | 'desc'
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     const result = await this.menuService.getAll({
       category,
-      visible: visible === 'true' ? true : visible === 'false' ? false : undefined,
-      inStock: inStock === 'true' ? true : inStock === 'false' ? false : undefined,
+      visible:
+        visible === 'true' ? true : visible === 'false' ? false : undefined,
+      inStock:
+        inStock === 'true' ? true : inStock === 'false' ? false : undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       sortBy,
@@ -58,11 +63,11 @@ export class MenuController {
   async getById(
     @Req() req: any,
     @Res() res: any,
-    @Param('menuId') menuId: number
+    @Param('menuId') menuId: number,
   ) {
     return res
       .status(HttpStatus.FOUND)
-      .json(await this.menuService.getById(menuId))
+      .json(await this.menuService.getById(menuId));
   }
 
   @ApiParam({ name: 'menuId', required: true })
@@ -72,27 +77,24 @@ export class MenuController {
   async deleteMenuItem(
     @Req() req: any,
     @Res() res: any,
-    @Param('menuId') menuId: number
+    @Param('menuId') menuId: number,
   ) {
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.menuService.deleteMenuItem(menuId))
+      .json(await this.menuService.deleteMenuItem(menuId));
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor(
-      [{ name: 'image', maxCount: 1 }],
-      {
-        storage: diskStorage({
-          destination: './public/menuItems',
-          filename: DRYFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
+    FileFieldsInterceptor([{ name: 'image', maxCount: 1 }], {
+      storage: diskStorage({
+        destination: './public/menuItems',
+        filename: DRYFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
   )
   async createMenuItem(
     @Req() req: any,
@@ -114,25 +116,20 @@ export class MenuController {
   @Roles('ADMIN')
   @Patch('/:menuId')
   @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'image', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './public/menuItems',
-          filename: DRYFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
+    FileFieldsInterceptor([{ name: 'image', maxCount: 1 }], {
+      storage: diskStorage({
+        destination: './public/menuItems',
+        filename: DRYFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
   )
   async updateMenuItem(
     @Req() req: any,
     @Res() res: any,
     @Param('menuId') menuId: number,
     @Body() body: UpdateMenuItemDto,
-    @UploadedFiles()  files: { image?: Express.Multer.File[] },
+    @UploadedFiles() files: { image?: Express.Multer.File[] },
   ) {
     if (!body || Object.keys(body).length === 0) {
       throw new BadRequestException('No update data provided');
@@ -144,6 +141,6 @@ export class MenuController {
 
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.menuService.updateMenuItem(menuId, body))
+      .json(await this.menuService.updateMenuItem(menuId, body));
   }
 }

@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  Injectable,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
@@ -30,7 +30,7 @@ export class RolesGuard implements CanActivate {
 
     if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
-        `Недостаточно прав. Требуется: ${requiredRoles.join(', ')}. Ваш уровень: ${user.role}`
+        `Недостаточно прав. Требуется: ${requiredRoles.join(', ')}. Ваш уровень: ${user.role}`,
       );
     }
 

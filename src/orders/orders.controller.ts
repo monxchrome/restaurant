@@ -52,7 +52,12 @@ export class OrdersController {
       sortOrder,
     };
 
-    const result = await this.ordersService.getAll(pageNum, pageSizeNum, filters, sort);
+    const result = await this.ordersService.getAll(
+      pageNum,
+      pageSizeNum,
+      filters,
+      sort,
+    );
 
     return res.status(HttpStatus.OK).json(result);
   }
@@ -64,10 +69,11 @@ export class OrdersController {
   async getById(
     @Req() req: any,
     @Res() res: any,
-    @Param('orderId') orderId: number) {
+    @Param('orderId') orderId: number,
+  ) {
     return res
       .status(HttpStatus.FOUND)
-      .json(await this.ordersService.getById(orderId))
+      .json(await this.ordersService.getById(orderId));
   }
 
   @ApiParam({ name: 'orderId', required: true })
@@ -77,19 +83,26 @@ export class OrdersController {
   async deleteById(
     @Req() req: any,
     @Res() res: any,
-    @Param('orderId') orderId: number) {
+    @Param('orderId') orderId: number,
+  ) {
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.ordersService.deleteOrder(orderId))
+      .json(await this.ordersService.deleteOrder(orderId));
   }
 
   @Post()
-  async createOrder(@Req() req: any, @Res() res: any, @Body() body: CreateOrderDto) {
+  async createOrder(
+    @Req() req: any,
+    @Res() res: any,
+    @Body() body: CreateOrderDto,
+  ) {
     try {
       const order = await this.ordersService.create(body);
       return res.status(HttpStatus.CREATED).json(order);
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: error.message });
     }
   }
 
@@ -101,15 +114,15 @@ export class OrdersController {
     @Req() req: any,
     @Res() res: any,
     @Param('orderId') orderId: number,
-    @Body() body: UpdateOrderDto) {
-
+    @Body() body: UpdateOrderDto,
+  ) {
     if (!body || Object.keys(body).length === 0) {
       throw new BadRequestException('No update data provided');
     }
 
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.ordersService.updateOrder(orderId, body))
+      .json(await this.ordersService.updateOrder(orderId, body));
   }
 
   @ApiParam({ name: 'orderId', required: true })
@@ -120,15 +133,15 @@ export class OrdersController {
     @Req() req: any,
     @Res() res: any,
     @Param('orderId') orderId: number,
-    @Body() body: UpdateOrderDto) {
-
+    @Body() body: UpdateOrderDto,
+  ) {
     if (!body || Object.keys(body).length === 0) {
       throw new BadRequestException('No update data provided');
     }
 
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.ordersService.updateOrderStatus(orderId, body))
+      .json(await this.ordersService.updateOrderStatus(orderId, body));
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -139,7 +152,10 @@ export class OrdersController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const data = await this.ordersService.getOrdersCountByStatus(startDate, endDate);
+    const data = await this.ordersService.getOrdersCountByStatus(
+      startDate,
+      endDate,
+    );
     return res.status(HttpStatus.OK).json(data);
   }
 
@@ -151,17 +167,18 @@ export class OrdersController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const data = await this.ordersService.getOrdersCountByDay(startDate, endDate);
+    const data = await this.ordersService.getOrdersCountByDay(
+      startDate,
+      endDate,
+    );
 
-    const transformed = data.map(item => ({
+    const transformed = data.map((item) => ({
       ...item,
       count: typeof item.count === 'bigint' ? Number(item.count) : item.count,
     }));
 
     return res.status(HttpStatus.OK).json(transformed);
   }
-
-
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
@@ -198,5 +215,4 @@ export class OrdersController {
     const data = await this.ordersService.getSummaryStats(startDate, endDate);
     return res.status(HttpStatus.OK).json(data);
   }
-
 }

@@ -1,36 +1,43 @@
-import tsParser from '@typescript-eslint/parser';
-import typescriptPlugin from '@typescript-eslint/eslint-plugin';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import { FlatCompat } from '@eslint/eslintrc';
+import typescriptParser from '@typescript-eslint/parser';
+import eslintPlugin from '@typescript-eslint/eslint-plugin';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
+
+const compat = new FlatCompat({
+  baseDirectory: new URL('.', import.meta.url).pathname,
+  recommended: true,
+});
 
 export default [
+  ...compat.extends(
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'prettier',
+  ),
+
   {
-    files: ['*.ts', '*.tsx', '*.js', '*.jsx'],
+    files: ['*.ts', '*.tsx'],
     languageOptions: {
-      parser: tsParser,
+      parser: typescriptParser,
       parserOptions: {
         project: './tsconfig.json',
         sourceType: 'module',
-      },
-      env: {
-        node: true,
-        jest: true,
+        ecmaVersion: 2020,
       },
     },
     plugins: {
-      '@typescript-eslint': typescriptPlugin,
-      'simple-import-sort': simpleImportSort,
+      '@typescript-eslint': eslintPlugin,
+      'simple-import-sort': simpleImportSortPlugin,
       import: importPlugin,
       prettier: prettierPlugin,
     },
     rules: {
-      ...typescriptPlugin.configs.recommended.rules,
-      ...prettierConfig.rules,
-      'prettier/prettier': 'error',
-
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: 'req|res|next' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: 'req|res|next' },
+      ],
       '@typescript-eslint/interface-name-prefix': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -40,6 +47,7 @@ export default [
       'import/first': 'error',
       'import/newline-after-import': ['error', { count: 1 }],
       'import/no-duplicates': 'error',
+
       'no-console': 'warn',
 
       'sort-imports': [
@@ -53,6 +61,6 @@ export default [
         },
       ],
     },
-    ignores: ['.eslint.config.mjs'],
+    ignores: ['.eslintrc.js'],
   },
 ];

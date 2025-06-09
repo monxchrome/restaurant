@@ -5,9 +5,7 @@ import { Category, MenuItem } from '@prisma/client';
 
 @Injectable()
 export class MenuService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async getAll(params?: {
     category?: string;
@@ -60,8 +58,8 @@ export class MenuService {
     return this.prismaService.menuItem.findUnique({
       where: {
         id: Number(menuId),
-      }
-    })
+      },
+    });
   }
 
   async createMenuItem(data: CreateMenuItemDto): Promise<MenuItem> {
@@ -73,8 +71,8 @@ export class MenuService {
         imageUrl: data.imageUrl,
         category: data.category,
         visible: data.visible,
-        inStock: data.inStock
-      }
+        inStock: data.inStock,
+      },
     });
   }
 
@@ -86,16 +84,16 @@ export class MenuService {
     return this.prismaService.menuItem.delete({
       where: {
         id: Number(menuId),
-      }
-    })
+      },
+    });
   }
 
   async updateMenuItem(menuId: number, updateData) {
     return this.prismaService.menuItem.update({
       where: {
-        id: Number(menuId)
+        id: Number(menuId),
       },
       data: updateData,
-    })
+    });
   }
 }
