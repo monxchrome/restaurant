@@ -21,7 +21,7 @@ export class UsersService {
     return this.prismaService.user.findUnique({
       where: {
         id: Number(userId),
-      }
+      },
     });
   }
 
@@ -29,8 +29,8 @@ export class UsersService {
     return this.prismaService.user.findFirst({
       where: {
         email: email,
-      }
-    })
+      },
+    });
   }
 
   async createUser(userData: CreateUserDto): Promise<User> {
@@ -41,8 +41,8 @@ export class UsersService {
         name: userData.name,
         surname: userData.surname,
         phone: userData.phone,
-      }
-    })
+      },
+    });
   }
 
   async hashPassword(password: string) {
@@ -53,17 +53,17 @@ export class UsersService {
     return this.prismaService.user.delete({
       where: {
         id: Number(userId),
-      }
-    })
+      },
+    });
   }
 
   async updateUser(userId: number, updateData) {
     return this.prismaService.user.update({
       where: {
-        id: Number(userId)
+        id: Number(userId),
       },
       data: updateData,
-    })
+    });
   }
 
   async registerUser(userData: CreateUserDto): Promise<User> {
@@ -76,17 +76,20 @@ export class UsersService {
         name: userData.name,
         surname: userData.surname,
         phone: userData.phone,
-      }
-    })
+      },
+    });
   }
 
-  async changePassword(userId: number, oldPassword: string, newPassword: string)
-  {
+  async changePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: Number(userId),
-      }
-    })
+      },
+    });
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -94,7 +97,7 @@ export class UsersService {
 
     const isMatched = await this.authService.compareHash(
       oldPassword,
-      user.password
+      user.password,
     );
 
     if (!isMatched) {
@@ -104,11 +107,11 @@ export class UsersService {
     const hashNewPassword = await this.hashPassword(newPassword);
     await this.prismaService.user.update({
       where: {
-        id: Number(userId)
+        id: Number(userId),
       },
       data: {
         password: hashNewPassword,
-      }
-    })
+      },
+    });
   }
 }

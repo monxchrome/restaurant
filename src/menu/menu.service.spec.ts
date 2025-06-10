@@ -7,11 +7,11 @@ describe('MenuService', () => {
   let service: MenuService;
   let prismaMock: {
     menuItem: {
-      findMany: jest.Mock,
-      findUnique: jest.Mock,
-      create: jest.Mock,
-      delete: jest.Mock,
-      update: jest.Mock,
+      findMany: jest.Mock;
+      findUnique: jest.Mock;
+      create: jest.Mock;
+      delete: jest.Mock;
+      update: jest.Mock;
     };
   };
 

@@ -23,9 +23,7 @@ describe('OrdersController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
-      providers: [
-        { provide: OrdersService, useValue: service }
-      ],
+      providers: [{ provide: OrdersService, useValue: service }],
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
@@ -83,9 +81,7 @@ describe('OrdersController', () => {
       clientSurname: 'Doe',
       clientPhone: '1234567890',
       totalPrice: 100,
-      items: [
-        { menuItemId: 1, quantity: 2, price: 50 }
-      ],
+      items: [{ menuItemId: 1, quantity: 2, price: 50 }],
     };
     const createdOrder = { id: 1, ...createOrderDto };
     service.create.mockResolvedValue(createdOrder);
@@ -104,9 +100,7 @@ describe('OrdersController', () => {
       clientSurname: 'Doe',
       clientPhone: '1234567890',
       totalPrice: 100,
-      items: [
-        { menuItemId: 1, quantity: 2, price: 50 }
-      ],
+      items: [{ menuItemId: 1, quantity: 2, price: 50 }],
     };
     const error = new Error('Test error');
     service.create.mockRejectedValue(error);
@@ -139,6 +133,8 @@ describe('OrdersController', () => {
     const orderId = 1;
     const emptyBody = {};
 
-    await expect(controller.updateOrder({}, res as any, orderId, emptyBody)).rejects.toThrow('No update data provided');
+    await expect(
+      controller.updateOrder({}, res as any, orderId, emptyBody),
+    ).rejects.toThrow('No update data provided');
   });
 });

@@ -45,33 +45,50 @@ describe('AuthController', () => {
     it('should return error if email is missing', async () => {
       await authController.login(mockRes, { password: '123' } as any);
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'ERROR.Check_request_email_param' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'ERROR.Check_request_email_param',
+      });
     });
 
     it('should return error if password is missing', async () => {
       await authController.login(mockRes, { email: 'test@test.com' } as any);
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'ERROR.Check_request_password_param' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'ERROR.Check_request_password_param',
+      });
     });
 
     it('should return unauthorized if user not found', async () => {
       (userService.getByEmail as jest.Mock).mockResolvedValue(null);
 
-      await authController.login(mockRes, { email: 'test@test.com', password: '123' });
+      await authController.login(mockRes, {
+        email: 'test@test.com',
+        password: '123',
+      });
 
       expect(userService.getByEmail).toHaveBeenCalledWith('test@test.com');
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Email or password is incorrect' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Email or password is incorrect',
+      });
     });
 
     it('should return unauthorized if password does not match', async () => {
-      (userService.getByEmail as jest.Mock).mockResolvedValue({ id: 1, password: 'hashed' });
+      (userService.getByEmail as jest.Mock).mockResolvedValue({
+        id: 1,
+        password: 'hashed',
+      });
       (authService.compareHash as jest.Mock).mockResolvedValue(false);
 
-      await authController.login(mockRes, { email: 'test@test.com', password: 'wrongpass' });
+      await authController.login(mockRes, {
+        email: 'test@test.com',
+        password: 'wrongpass',
+      });
 
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Invalid email or password' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Invalid email or password',
+      });
     });
 
     it('should return tokens on successful login', async () => {
@@ -79,9 +96,14 @@ describe('AuthController', () => {
       (userService.getByEmail as jest.Mock).mockResolvedValue(user);
       (authService.compareHash as jest.Mock).mockResolvedValue(true);
       (authService.signIn as jest.Mock).mockResolvedValue('access-token');
-      (authService.generateRefreshToken as jest.Mock).mockResolvedValue('refresh-token');
+      (authService.generateRefreshToken as jest.Mock).mockResolvedValue(
+        'refresh-token',
+      );
 
-      await authController.login(mockRes, { email: 'test@test.com', password: 'correctpass' });
+      await authController.login(mockRes, {
+        email: 'test@test.com',
+        password: 'correctpass',
+      });
 
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -114,7 +136,9 @@ describe('AuthController', () => {
       });
 
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'User is already exist' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'User is already exist',
+      });
     });
 
     it('should register user and return token', async () => {
@@ -150,7 +174,9 @@ describe('AuthController', () => {
       });
 
       expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-      expect(mockRes.json).toHaveBeenCalledWith({ message: 'ERROR.Failed_to_register_user' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'ERROR.Failed_to_register_user',
+      });
     });
   });
 });

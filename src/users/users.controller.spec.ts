@@ -49,9 +49,7 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [
-        { provide: UsersService, useValue: mockUsersService },
-      ],
+      providers: [{ provide: UsersService, useValue: mockUsersService }],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: jest.fn(() => true) })
@@ -83,7 +81,9 @@ describe('UsersController', () => {
 
       await controller.createUser({}, mockResponse, mockCreateUserDto);
 
-      expect(mockUsersService.createUser).toHaveBeenCalledWith(mockCreateUserDto);
+      expect(mockUsersService.createUser).toHaveBeenCalledWith(
+        mockCreateUserDto,
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(mockResponse.json).toHaveBeenCalledWith(mockUser);
     });
@@ -119,14 +119,17 @@ describe('UsersController', () => {
 
       await controller.updateUser({}, mockResponse, 1, mockUpdateUserDto);
 
-      expect(mockUsersService.updateUser).toHaveBeenCalledWith(1, mockUpdateUserDto);
+      expect(mockUsersService.updateUser).toHaveBeenCalledWith(
+        1,
+        mockUpdateUserDto,
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.ACCEPTED);
       expect(mockResponse.json).toHaveBeenCalledWith(mockUser);
     });
 
     it('should throw BadRequestException if no update data provided', async () => {
       await expect(
-        controller.updateUser({}, mockResponse, 1, {})
+        controller.updateUser({}, mockResponse, 1, {}),
       ).rejects.toThrow(BadRequestException);
       expect(mockUsersService.updateUser).not.toHaveBeenCalled();
     });

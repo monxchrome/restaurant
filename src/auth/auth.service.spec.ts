@@ -26,15 +26,28 @@ describe('AuthService', () => {
 
   describe('compareHash', () => {
     it('should return true if passwords match', async () => {
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(true));
-      const result = await authService.compareHash('plainPassword', 'hashedPassword');
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(true));
+      const result = await authService.compareHash(
+        'plainPassword',
+        'hashedPassword',
+      );
       expect(result).toBe(true);
-      expect(bcrypt.compare).toHaveBeenCalledWith('plainPassword', 'hashedPassword');
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'plainPassword',
+        'hashedPassword',
+      );
     });
 
     it('should return false if passwords do not match', async () => {
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(false));
-      const result = await authService.compareHash('plainPassword', 'wrongHash');
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(false));
+      const result = await authService.compareHash(
+        'plainPassword',
+        'wrongHash',
+      );
       expect(result).toBe(false);
       expect(bcrypt.compare).toHaveBeenCalledWith('plainPassword', 'wrongHash');
     });
@@ -42,7 +55,9 @@ describe('AuthService', () => {
 
   describe('signIn', () => {
     it('should call jwtService.sign with correct payload', async () => {
-      const signMock = jest.spyOn(jwtService, 'sign').mockReturnValue('signedToken');
+      const signMock = jest
+        .spyOn(jwtService, 'sign')
+        .mockReturnValue('signedToken');
       const token = await authService.signIn('userId123');
       expect(signMock).toHaveBeenCalledWith({ id: 'userId123' });
       expect(token).toBe('signedToken');
@@ -51,7 +66,9 @@ describe('AuthService', () => {
 
   describe('generateRefreshToken', () => {
     it('should call jwtService.sign with correct payload and options', async () => {
-      const signMock = jest.spyOn(jwtService, 'sign').mockReturnValue('refreshToken');
+      const signMock = jest
+        .spyOn(jwtService, 'sign')
+        .mockReturnValue('refreshToken');
 
       process.env.JWT_REFRESH_SECRET = 'secretKey';
       process.env.JWT_REFRESH_EXPIRES_IN = '7d';

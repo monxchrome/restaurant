@@ -132,7 +132,7 @@ describe('OrdersService', () => {
           waiterId: null,
           totalPrice: mockCreateOrderDto.totalPrice,
           items: {
-            create: mockCreateOrderDto.items.map(item => ({
+            create: mockCreateOrderDto.items.map((item) => ({
               menuItemId: item.menuItemId,
               quantity: item.quantity,
               price: item.price,
@@ -148,9 +148,15 @@ describe('OrdersService', () => {
   describe('updateOrder', () => {
     it('should update an order and send notification if waiterId exists', async () => {
       const updateData = { status: OrderStatus.PREPARING, waiterId: 1 };
-      const updatedOrder = { ...mockOrder, status: OrderStatus.PREPARING, waiterId: 1 };
+      const updatedOrder = {
+        ...mockOrder,
+        status: OrderStatus.PREPARING,
+        waiterId: 1,
+      };
       mockPrismaService.order.update.mockResolvedValue(updatedOrder);
-      mockPrismaService.user.findUnique.mockResolvedValue({ pushToken: 'waiterToken' });
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        pushToken: 'waiterToken',
+      });
       mockNotificationService.sendNotification.mockResolvedValue(undefined);
 
       const result = await service.updateOrder(1, updateData);
@@ -203,7 +209,10 @@ describe('OrdersService', () => {
       ];
       mockPrismaService.order.groupBy.mockResolvedValue(mockResult);
 
-      const result = await service.getOrdersCountByStatus('2023-01-01', '2023-12-31');
+      const result = await service.getOrdersCountByStatus(
+        '2023-01-01',
+        '2023-12-31',
+      );
 
       expect(result).toEqual(mockResult);
       expect(mockPrismaService.order.groupBy).toHaveBeenCalledWith({
@@ -227,7 +236,10 @@ describe('OrdersService', () => {
       ];
       mockPrismaService.$queryRaw.mockResolvedValue(mockResult);
 
-      const result = await service.getOrdersCountByDay('2023-01-01', '2023-01-02');
+      const result = await service.getOrdersCountByDay(
+        '2023-01-01',
+        '2023-01-02',
+      );
 
       expect(result).toEqual(mockResult);
       expect(mockPrismaService.$queryRaw).toHaveBeenCalled();
@@ -251,7 +263,9 @@ describe('OrdersService', () => {
 
   describe('getAverageCheck', () => {
     it('should return average check', async () => {
-      mockPrismaService.order.aggregate.mockResolvedValue({ _avg: { totalPrice: 75.5 } });
+      mockPrismaService.order.aggregate.mockResolvedValue({
+        _avg: { totalPrice: 75.5 },
+      });
 
       const result = await service.getAverageCheck('2023-01-01', '2023-01-02');
 
@@ -270,7 +284,9 @@ describe('OrdersService', () => {
 
   describe('getSummaryStats', () => {
     it('should return summary statistics', async () => {
-      const mockCountByStatus = [{ status: OrderStatus.PENDING, _count: { id: 5 } }];
+      const mockCountByStatus = [
+        { status: OrderStatus.PENDING, _count: { id: 5 } },
+      ];
       const mockRevenueByDay = [{ day: '2023-01-01', revenue: 500 }];
       const mockAverageCheck = 100;
 
@@ -278,7 +294,9 @@ describe('OrdersService', () => {
       mockPrismaService.$queryRaw
         .mockResolvedValueOnce(mockRevenueByDay)
         .mockResolvedValueOnce(mockRevenueByDay);
-      mockPrismaService.order.aggregate.mockResolvedValue({ _avg: { totalPrice: mockAverageCheck } });
+      mockPrismaService.order.aggregate.mockResolvedValue({
+        _avg: { totalPrice: mockAverageCheck },
+      });
 
       const result = await service.getSummaryStats('2023-01-01', '2023-01-02');
 

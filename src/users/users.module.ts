@@ -6,7 +6,7 @@ import { PrismaModule } from '../core/orm/prisma.module';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, NotificationModule, forwardRef(() => AuthModule),],
+  imports: [PrismaModule, NotificationModule, forwardRef(() => AuthModule)],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

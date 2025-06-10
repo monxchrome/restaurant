@@ -27,42 +27,42 @@ export class UsersController {
   async getAll(@Req() req: any, @Res() res: any) {
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.usersService.getAll())
+      .json(await this.usersService.getAll());
   }
 
   @Post()
   async createUser(
     @Req() req: any,
     @Res() res: any,
-    @Body() body: CreateUserDto
+    @Body() body: CreateUserDto,
   ) {
     return res
       .status(HttpStatus.CREATED)
-      .json(await this.usersService.createUser(body))
+      .json(await this.usersService.createUser(body));
   }
 
-  @ApiParam({name: 'userId', required: true})
+  @ApiParam({ name: 'userId', required: true })
   @Get('/:userId')
   async getById(
     @Req() req: any,
     @Res() res: any,
-    @Param('userId') userId: number
+    @Param('userId') userId: number,
   ) {
     return res
       .status(HttpStatus.FOUND)
-      .json(await this.usersService.getById(userId))
+      .json(await this.usersService.getById(userId));
   }
 
-  @ApiParam({name: 'userId', required: true})
+  @ApiParam({ name: 'userId', required: true })
   @Delete('/:userId')
   async deleteUser(
     @Req() req: any,
     @Res() res: any,
-    @Param('userId') userId: number
+    @Param('userId') userId: number,
   ) {
     return res
       .status(HttpStatus.FOUND)
-      .json(await this.usersService.deleteUser(userId))
+      .json(await this.usersService.deleteUser(userId));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -86,21 +86,29 @@ export class UsersController {
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'User not authenticated' });
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ message: 'User not authenticated' });
     }
 
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.usersService.changePassword(userId, oldPassword, newPassword))
+      .json(
+        await this.usersService.changePassword(
+          userId,
+          oldPassword,
+          newPassword,
+        ),
+      );
   }
 
-  @ApiParam({name: 'userId', required: true})
+  @ApiParam({ name: 'userId', required: true })
   @Patch('/:userId')
   async updateUser(
     @Req() req: any,
     @Res() res: any,
     @Param('userId') userId: number,
-    @Body() body: UpdateUserDto
+    @Body() body: UpdateUserDto,
   ) {
     if (!body || Object.keys(body).length === 0) {
       throw new BadRequestException('No update data provided');
@@ -108,6 +116,6 @@ export class UsersController {
 
     return res
       .status(HttpStatus.ACCEPTED)
-      .json(await this.usersService.updateUser(userId, body))
+      .json(await this.usersService.updateUser(userId, body));
   }
 }
