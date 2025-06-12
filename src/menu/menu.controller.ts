@@ -28,7 +28,6 @@ import { GcsService } from '../common/services/gcs.service';
 
 @ApiTags('MenuItem')
 @Controller('menu')
-@UseGuards(JwtAuthGuard)
 export class MenuController {
   constructor(
     private readonly menuService: MenuService,
