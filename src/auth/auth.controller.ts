@@ -59,7 +59,7 @@ export class AuthController {
 
     res.cookie('refreshToken', tokenPair.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -71,6 +71,15 @@ export class AuthController {
 
   @Post('register')
   async register(@Res() res: any, @Body() body: RegisterDto) {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      body.secret !== process.env.REGISTRATION_SECRET
+    ) {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: 'Registration is disabled' });
+    }
+
     const findUser = await this.userService.getByEmail(body.email.trim());
 
     if (findUser) {
@@ -92,7 +101,7 @@ export class AuthController {
 
       res.cookie('refreshToken', tokenPair.refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
@@ -132,7 +141,7 @@ export class AuthController {
 
       res.cookie('refreshToken', tokenPair.refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });

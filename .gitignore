@@ -16,6 +16,8 @@ dist/*
 .env
 /.env
 /env
+.env.production
+/env.production
 
 firebase-service-account.json
 /firebase-service-account.json

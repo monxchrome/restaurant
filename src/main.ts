@@ -9,8 +9,15 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  const allowedOrigins = process.env.CORS_ORIGINS;
   app.enableCors({
-    origin: 'http://localhost:8080',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -22,15 +29,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('API Klever Gurme')
-    .setDescription('Klever Gurme restaurant')
-    .setVersion('0.0.0-release-candidate.0')
-    .addTag('restaurant')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  await app.listen(3001);
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('API Klever Gurme')
+      .setDescription('Klever Gurme restaurant')
+      .setVersion('0.0.0-release.0')
+      .addTag('restaurant')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+  }
+
+  // await app.listen(3001);
+  await app.listen(process.env.PORT, '0.0.0.0');
 }
 
 bootstrap();
