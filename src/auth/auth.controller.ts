@@ -94,6 +94,7 @@ export class AuthController {
       name: body.name,
       surname: body.surname,
       phone: body.phone,
+      role: body.role,
     });
 
     if (user) {

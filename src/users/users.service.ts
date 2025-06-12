@@ -76,6 +76,7 @@ export class UsersService {
         name: userData.name,
         surname: userData.surname,
         phone: userData.phone,
+        role: userData.role,
       },
     });
   }

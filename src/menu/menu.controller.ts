@@ -17,19 +17,23 @@ import {
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { DRYFileName, imageFileFilter } from '../core/file-upload/file-upload';
+import { imageFileFilter } from '../core/file-upload/file-upload';
 import { CreateMenuItemDto, UpdateMenuItemDto } from './dto/menuItem.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
+import { GcsService } from '../common/services/gcs.service';
 
 @ApiTags('MenuItem')
 @Controller('menu')
 @UseGuards(JwtAuthGuard)
 export class MenuController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly gcsService: GcsService,
+  ) {}
 
   @Get()
   async getAll(
@@ -89,10 +93,7 @@ export class MenuController {
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'image', maxCount: 1 }], {
-      storage: diskStorage({
-        destination: './public/menuItems',
-        filename: DRYFileName,
-      }),
+      storage: memoryStorage(),
       fileFilter: imageFileFilter,
     }),
   )
@@ -103,7 +104,10 @@ export class MenuController {
     @UploadedFiles() files: { image?: Express.Multer.File[] },
   ) {
     if (files?.image?.[0]) {
-      body.imageUrl = `/public/menuItems/${files.image[0].filename}`;
+      body.imageUrl = await this.gcsService.uploadFile(
+        files.image[0],
+        'menuItems',
+      );
     }
 
     return res
@@ -117,10 +121,7 @@ export class MenuController {
   @Patch('/:menuId')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'image', maxCount: 1 }], {
-      storage: diskStorage({
-        destination: './public/menuItems',
-        filename: DRYFileName,
-      }),
+      storage: memoryStorage(),
       fileFilter: imageFileFilter,
     }),
   )
@@ -136,7 +137,10 @@ export class MenuController {
     }
 
     if (files?.image?.[0]) {
-      body.imageUrl = `/public/menuItems/${files.image[0].filename}`;
+      body.imageUrl = await this.gcsService.uploadFile(
+        files.image[0],
+        'menuItems',
+      );
     }
 
     return res

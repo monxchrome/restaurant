@@ -5,9 +5,10 @@ import { PrismaModule } from '../core/orm/prisma.module';
 import { PrismaService } from '../core/orm/prisma.service';
 import { UsersService } from '../users/users.service';
 import { AuthModule } from '../auth/auth.module';
+import { GcsModule } from '../common/services/gcs.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule],
+  imports: [PrismaModule, AuthModule, GcsModule],
   controllers: [MenuController],
   providers: [MenuService, UsersService, PrismaService],
   exports: [MenuService],

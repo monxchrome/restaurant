@@ -68,10 +68,10 @@ export class RegisterDto {
   phone: string;
 
   @ApiProperty({
-    example: 'WAITER',
+    example: 'USER',
     description: 'User role',
     enum: Role,
-    default: Role.WAITER,
+    default: Role.USER,
   })
   @IsEnum(Role)
   role: Role;
