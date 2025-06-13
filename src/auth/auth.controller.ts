@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
+  HttpCode,
   HttpStatus,
   Post,
   Req,
@@ -18,6 +20,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 import { addDays } from 'date-fns';
 import { TokenService } from './token.service';
+import { User } from '@prisma/client';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -88,14 +91,26 @@ export class AuthController {
         .json({ message: 'User is already exist' });
     }
 
-    const user = await this.userService.registerUser({
+    const userData: any = {
       email: body.email,
       password: body.password,
       name: body.name,
       surname: body.surname,
       phone: body.phone,
-      role: body.role,
-    });
+    };
+
+    if (body.role && body.role !== 'USER') {
+      if (!body.secret) {
+        throw new ForbiddenException(
+          'A secret key is required to assign a custom role.',
+        );
+      }
+      if (body.secret !== process.env.REGISTRATION_SECRET) {
+        throw new ForbiddenException('Invalid secret key for role assignment.');
+      }
+      userData.role = body.role;
+    }
+    const user = await this.userService.registerUser(userData);
 
     if (user) {
       const tokenPair = await this.authService.generateTokenPair(user.id);

@@ -1,5 +1,8 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'WAITER');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'WAITER', 'USER');
+
+-- CreateEnum
+CREATE TYPE "Category" AS ENUM ('SALADS_AND_SNACKS', 'SOUPS', 'GRILL_DISHES', 'MAIN_HOT_DISHES', 'PIZZA_AND_PIES', 'DESSERTS', 'DRINKS', 'EXTRAS');
 
 -- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PREPARING', 'READY', 'DELIVERING', 'DELIVERED', 'CANCELLED');
@@ -7,12 +10,12 @@ CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PREPARING', 'READY', 'DELIVERING'
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "email" TEXT,
+    "password" TEXT,
     "name" TEXT NOT NULL,
     "surname" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'WAITER',
+    "role" "Role" NOT NULL DEFAULT 'USER',
     "pushToken" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -55,8 +58,22 @@ CREATE TABLE "MenuItem" (
     "price" DOUBLE PRECISION NOT NULL,
     "imageUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "category" "Category" NOT NULL DEFAULT 'EXTRAS',
+    "visible" BOOLEAN NOT NULL DEFAULT true,
+    "inStock" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "MenuItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Token" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "refreshToken" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -70,3 +87,6 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("or
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_menuItemId_fkey" FOREIGN KEY ("menuItemId") REFERENCES "MenuItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

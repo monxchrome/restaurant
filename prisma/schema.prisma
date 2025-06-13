@@ -9,18 +9,20 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  surname   String
-  phone     String
-  role      Role     @default(USER)
-  pushToken String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Order     Order[]
-  Token     Token[]
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  password       String
+  name           String
+  surname        String
+  phone          String
+  role           Role     @default(USER)
+  pushToken      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ordersAsClient Order[]  @relation("ClientOrders")
+  ordersAsWaiter Order[]  @relation("WaiterOrders")
+  Token          Token[]
+  Order          Order[]
 }
 
 enum Role {
@@ -30,18 +32,27 @@ enum Role {
 }
 
 model Order {
-  id              Int         @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   clientName      String
   clientSurname   String
   clientPhone     String
   deliveryAddress String
-  waiterId        Int?
-  waiter          User?       @relation(fields: [waiterId], references: [id])
-  items           OrderItem[]
-  status          OrderStatus @default(PENDING)
-  totalPrice      Float
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+
+  clientId Int?
+  client   User? @relation("ClientOrders", fields: [clientId], references: [id])
+
+  waiterId Int?
+  waiter   User? @relation("WaiterOrders", fields: [waiterId], references: [id])
+
+  guestPushToken String?
+
+  items      OrderItem[]
+  status     OrderStatus @default(PENDING)
+  totalPrice Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  User       User?       @relation(fields: [userId], references: [id])
+  userId     Int?
 }
 
 model OrderItem {

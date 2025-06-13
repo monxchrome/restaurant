@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Order, OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../core/orm/prisma.service';
 import { NotificationService } from '../notifications/notification.service';
-import { CreateOrderDto } from './dto/order.dto';
+import { CreateGuestOrderDto, CreateOrderDto } from './dto/order.dto';
 import { OrderGateway } from './order.gateway';
 
 @Injectable()
@@ -72,6 +76,20 @@ export class OrdersService {
   }
 
   async create(data: CreateOrderDto): Promise<Order> {
+    const menuItemIds = data.items.map((item) => item.menuItemId);
+
+    const existingMenuItems = await this.prismaService.menuItem.findMany({
+      where: {
+        id: { in: menuItemIds },
+      },
+    });
+
+    if (existingMenuItems.length !== menuItemIds.length) {
+      throw new BadRequestException(
+        'One or more menu items in the order do not exist.',
+      );
+    }
+
     const order = await this.prismaService.order.create({
       data: {
         clientName: data.clientName,
@@ -109,6 +127,51 @@ export class OrdersService {
     return order;
   }
 
+  async createGuestOrder(data: CreateGuestOrderDto): Promise<Order> {
+    const menuItemIds = data.items.map((item) => item.menuItemId);
+
+    const existingMenuItems = await this.prismaService.menuItem.findMany({
+      where: {
+        id: { in: menuItemIds },
+      },
+    });
+
+    if (existingMenuItems.length !== menuItemIds.length) {
+      throw new BadRequestException(
+        'One or more menu items in the order do not exist.',
+      );
+    }
+
+    const order = await this.prismaService.order.create({
+      data: {
+        clientName: data.clientName,
+        clientSurname: data.clientSurname,
+        clientPhone: data.clientPhone,
+        deliveryAddress: data.deliveryAddress,
+        guestPushToken: data.pushToken,
+        totalPrice: data.totalPrice,
+        items: { create: data.items },
+      },
+      include: { items: true },
+    });
+
+    this.orderGateway.sendOrderUpdate({
+      type: 'CREATED',
+      order,
+    });
+
+    const adminTokens = await this.getAdminFcmTokens();
+    for (const token of adminTokens) {
+      await this.notificationService.sendNotification(
+        token,
+        'Новый заказ',
+        `Создан заказ от ${order.clientName} ${order.clientSurname}`,
+      );
+    }
+
+    return order;
+  }
+
   async updateOrderStatus(orderId: number, updateData): Promise<Order> {
     const data: any = {
       status: updateData.status,
@@ -121,7 +184,7 @@ export class OrdersService {
     const updatedOrder = await this.prismaService.order.update({
       where: { id: Number(orderId) },
       data,
-      include: { items: true },
+      include: { items: true, client: true },
     });
 
     this.orderGateway.sendOrderUpdate({
@@ -138,6 +201,17 @@ export class OrdersService {
           `Статус заказа #${orderId} изменён на ${updatedOrder.status}`,
         );
       }
+    }
+
+    if (updatedOrder.client && updatedOrder.client.pushToken) {
+      const title = `Статус вашего заказа обновлен`;
+      const body = `Заказ #${orderId} теперь в статусе "${updatedOrder.status}"`;
+
+      await this.notificationService.sendNotification(
+        updatedOrder.client.pushToken,
+        title,
+        body,
+      );
     }
 
     return updatedOrder;

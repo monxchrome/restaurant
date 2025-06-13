@@ -15,7 +15,11 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { CreateOrderDto, UpdateOrderDto } from './dto/order.dto';
+import {
+  CreateGuestOrderDto,
+  CreateOrderDto,
+  UpdateOrderDto,
+} from './dto/order.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { Order, OrderStatus } from '@prisma/client';
 import { RolesGuard } from '../guards/roles.guard';
@@ -104,6 +108,17 @@ export class OrdersController {
         .status(HttpStatus.BAD_REQUEST)
         .json({ message: error.message });
     }
+  }
+
+  @Post('guest')
+  async createGuestOrder(
+    @Req() req: any,
+    @Res() res: any,
+    @Body() body: CreateGuestOrderDto,
+  ) {
+    return res
+      .status(HttpStatus.CREATED)
+      .json(await this.ordersService.createGuestOrder(body));
   }
 
   @ApiParam({ name: 'orderId', required: true })

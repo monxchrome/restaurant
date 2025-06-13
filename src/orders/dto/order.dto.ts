@@ -162,3 +162,60 @@ export class UpdateOrderDto {
   @IsOptional()
   items?: UpdateOrderItemDto[];
 }
+
+export class CreateGuestOrderDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @Matches(NAME_REGEX, { message: 'Имя содержит недопустимые символы' })
+  @MaxLength(50)
+  clientName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @Matches(NAME_REGEX, { message: 'Фамилия содержит недопустимые символы' })
+  @MaxLength(50)
+  clientSurname: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsPhoneNumber('RU', { message: 'Некорректный формат телефона' })
+  clientPhone: string;
+
+  @IsString()
+  @IsOptional()
+  pushToken?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  deliveryAddress?: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  @IsNumber()
+  @IsOptional()
+  waiterId?: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  totalPrice: number;
+
+  @ApiProperty({
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
+    required: false,
+  })
+  @IsEnum(OrderStatus)
+  @IsOptional()
+  status?: OrderStatus;
+
+  @ApiProperty({ type: [OrderItemDto] })
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  @ArrayMinSize(1)
+  items: OrderItemDto[];
+}
