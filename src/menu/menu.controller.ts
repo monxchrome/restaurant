@@ -69,7 +69,7 @@ export class MenuController {
     @Param('menuId') menuId: number,
   ) {
     return res
-      .status(HttpStatus.FOUND)
+      .status(HttpStatus.OK)
       .json(await this.menuService.getById(menuId));
   }
 

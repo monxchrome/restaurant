@@ -34,7 +34,7 @@ export class CreateMenuItemDto {
   description?: string;
 
   @ApiProperty({ example: 350, description: 'Цена блюда в рублях' })
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
   @Transform(({ value }) => Number(value))
   price: number;

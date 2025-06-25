@@ -100,6 +100,10 @@ export class OrdersController {
     @Res() res: any,
     @Body() body: CreateOrderDto,
   ) {
+    console.log(
+      'Получен body в createGuestOrder:',
+      JSON.stringify(body, null, 2),
+    );
     try {
       const order = await this.ordersService.create(body);
       return res.status(HttpStatus.CREATED).json(order);
@@ -116,6 +120,10 @@ export class OrdersController {
     @Res() res: any,
     @Body() body: CreateGuestOrderDto,
   ) {
+    console.log(
+      'Получен body в createGuestOrder:',
+      JSON.stringify(body, null, 2),
+    );
     return res
       .status(HttpStatus.CREATED)
       .json(await this.ordersService.createGuestOrder(body));
