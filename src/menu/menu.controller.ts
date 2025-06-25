@@ -116,7 +116,7 @@ export class MenuController {
 
   @ApiParam({ name: 'menuId', required: true })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'WAITER')
   @Patch('/:menuId')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'image', maxCount: 1 }], {
