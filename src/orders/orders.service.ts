@@ -9,6 +9,16 @@ import { NotificationService } from '../notifications/notification.service';
 import { CreateGuestOrderDto, CreateOrderDto } from './dto/order.dto';
 import { OrderGateway } from './order.gateway';
 
+const statusMessages: Record<OrderStatus, string> = {
+  [OrderStatus.PENDING]: 'ожидает подтверждения 🕓',
+  [OrderStatus.PREPARING]: 'готовится 👨‍🍳',
+  [OrderStatus.READY]: 'готов к выдаче 🛎️',
+  [OrderStatus.DELIVERING]: 'уже в пути 🛵',
+  [OrderStatus.DELIVERED]: 'доставлен ✅',
+  [OrderStatus.CANCELLED]: 'отменён ❌',
+};
+
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -160,12 +170,11 @@ export class OrdersService {
       order,
     });
 
-    const adminTokens = await this.getAdminFcmTokens();
-    for (const token of adminTokens) {
+    if (order?.guestPushToken) {
       await this.notificationService.sendNotification(
-        token,
-        'Новый заказ',
-        `Создан заказ от ${order.clientName} ${order.clientSurname}`,
+        order.guestPushToken,
+        '🎉 Заказ принят!',
+        'Спасибо за ваш заказ! 👨‍🍳',
       );
     }
 
@@ -192,25 +201,22 @@ export class OrdersService {
       order: updatedOrder,
     });
 
-    if (updatedOrder.waiterId) {
-      const waiterToken = await this.getWaiterFcmToken(updatedOrder.waiterId);
-      if (waiterToken) {
-        await this.notificationService.sendNotification(
-          waiterToken,
-          'Обновлен статус заказа',
-          `Статус заказа #${orderId} изменён на ${updatedOrder.status}`,
-        );
-      }
-    }
+    const order = await this.prismaService.order.findUnique({
+      where: { id: Number(orderId) },
+      select: {
+        guestPushToken: true,
+        clientName: true,
+        clientSurname: true,
+        status: true,
+      },
+    });
 
-    if (updatedOrder.client && updatedOrder.client.pushToken) {
-      const title = `Статус вашего заказа обновлен`;
-      const body = `Заказ #${orderId} теперь в статусе "${updatedOrder.status}"`;
-
+    if (order?.guestPushToken) {
+      const statusText = statusMessages[updatedOrder.status];
       await this.notificationService.sendNotification(
-        updatedOrder.client.pushToken,
-        title,
-        body,
+        order.guestPushToken,
+        '📦 Обновление заказа',
+        `Ваш заказ ${statusText}`,
       );
     }
 

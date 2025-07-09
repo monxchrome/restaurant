@@ -1,3 +1,5 @@
+import './firebase/firebase';
+
 import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -33,7 +35,7 @@ async function bootstrap() {
     const config = new DocumentBuilder()
       .setTitle('API Klever Gurme')
       .setDescription('Klever Gurme restaurant')
-      .setVersion('1.2.1-release.3')
+      .setVersion('1.3.7-release.4')
       .addTag('restaurant')
       .build();
     const document = SwaggerModule.createDocument(app, config);
