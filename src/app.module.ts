@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { MenuModule } from './menu/menu.module';
 import { OrdersModule } from './orders/orders.module';
 import { NotificationModule } from './notifications/notification.module';
+import { PrivacyModule } from './privacy/privacy.module';
 import { PrismaModule } from './core/orm/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -19,6 +20,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     MenuModule,
     OrdersModule,
     NotificationModule,
+    PrivacyModule,
     PrismaModule,
     PassportModule,
     ServeStaticModule.forRoot({
