@@ -224,9 +224,29 @@ export class OrdersService {
   }
 
   async updateOrder(orderId: number, updateData): Promise<Order> {
+    // Если есть items, нужно обработать их отдельно
+    const { items, ...otherData } = updateData;
+    
+    let dataToUpdate = otherData;
+    
+    // Если переданы items, добавляем их в data
+    if (items && Array.isArray(items)) {
+      dataToUpdate = {
+        ...otherData,
+        items: {
+          deleteMany: {}, // Удаляем все существующие items
+          create: items.map(item => ({
+            menuItemId: item.menuItemId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      };
+    }
+
     const updatedOrder = await this.prismaService.order.update({
       where: { id: Number(orderId) },
-      data: updateData,
+      data: dataToUpdate,
       include: { items: true },
     });
 
