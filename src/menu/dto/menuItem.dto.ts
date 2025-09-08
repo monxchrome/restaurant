@@ -61,6 +61,15 @@ export class CreateMenuItemDto {
   @IsBoolean()
   @Transform(({ value }) => value === 'true')
   inStock?: boolean;
+
+  @ApiProperty({ 
+    example: false, 
+    required: false, 
+    description: 'Блюдо под заказ (готовится долго, нужно заказывать заранее)' 
+  })
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  isSpecialOrder?: boolean;
 }
 
 export class UpdateMenuItemDto {
@@ -104,4 +113,14 @@ export class UpdateMenuItemDto {
   @IsOptional()
   @Transform(({ value }) => value === 'true')
   inStock?: boolean;
+
+  @ApiPropertyOptional({ 
+    example: false, 
+    required: false, 
+    description: 'Блюдо под заказ (готовится долго, нужно заказывать заранее)' 
+  })
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
+  isSpecialOrder?: boolean;
 }

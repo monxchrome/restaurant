@@ -69,6 +69,7 @@ export class AuthController {
 
     return res.status(HttpStatus.OK).json({
       accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
     });
   }
 
@@ -124,6 +125,7 @@ export class AuthController {
 
       return res.status(HttpStatus.OK).json({
         accessToken: tokenPair.accessToken,
+        refreshToken: tokenPair.refreshToken,
       });
     }
 

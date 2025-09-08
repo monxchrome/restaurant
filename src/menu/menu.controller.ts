@@ -41,6 +41,7 @@ export class MenuController {
     @Query('category') category?: string,
     @Query('visible') visible?: string,
     @Query('inStock') inStock?: string,
+    @Query('isSpecialOrder') isSpecialOrder?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('sortBy') sortBy?: 'name' | 'price' | 'createdAt',
@@ -52,6 +53,8 @@ export class MenuController {
         visible === 'true' ? true : visible === 'false' ? false : undefined,
       inStock:
         inStock === 'true' ? true : inStock === 'false' ? false : undefined,
+      isSpecialOrder:
+        isSpecialOrder === 'true' ? true : isSpecialOrder === 'false' ? false : undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       sortBy,

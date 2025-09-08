@@ -11,6 +11,7 @@ export class MenuService {
     category?: string;
     visible?: boolean;
     inStock?: boolean;
+    isSpecialOrder?: boolean;
     minPrice?: number;
     maxPrice?: number;
     sortBy?: 'name' | 'price' | 'createdAt';
@@ -20,6 +21,7 @@ export class MenuService {
       category,
       visible,
       inStock,
+      isSpecialOrder,
       minPrice,
       maxPrice,
       sortBy = 'createdAt',
@@ -38,6 +40,10 @@ export class MenuService {
 
     if (typeof inStock === 'boolean') {
       where.inStock = inStock;
+    }
+
+    if (typeof isSpecialOrder === 'boolean') {
+      where.isSpecialOrder = isSpecialOrder;
     }
 
     if (typeof minPrice === 'number' || typeof maxPrice === 'number') {
@@ -72,6 +78,7 @@ export class MenuService {
         category: data.category,
         visible: data.visible,
         inStock: data.inStock,
+        isSpecialOrder: data.isSpecialOrder,
       },
     });
   }
