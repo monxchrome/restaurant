@@ -50,6 +50,14 @@ export class UsersService {
   }
 
   async deleteUser(userId: number) {
+    // First delete all tokens associated with this user
+    await this.prismaService.token.deleteMany({
+      where: {
+        userId: Number(userId),
+      },
+    });
+
+    // Then delete the user
     return this.prismaService.user.delete({
       where: {
         id: Number(userId),
