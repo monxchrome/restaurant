@@ -61,7 +61,7 @@ export class UsersController {
     @Param('userId') userId: number,
   ) {
     return res
-      .status(HttpStatus.FOUND)
+      .status(HttpStatus.OK)
       .json(await this.usersService.deleteUser(userId));
   }
 
