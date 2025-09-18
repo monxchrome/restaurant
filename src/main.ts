@@ -35,7 +35,7 @@ async function bootstrap() {
     const config = new DocumentBuilder()
       .setTitle('API Klever Gurme')
       .setDescription('Klever Gurme restaurant')
-      .setVersion('1.3.7-release.4')
+      .setVersion('1.4.0-release.5')
       .addTag('restaurant')
       .build();
     const document = SwaggerModule.createDocument(app, config);
